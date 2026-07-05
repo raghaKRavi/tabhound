@@ -1,0 +1,12 @@
+{
+  "name": "tabhound",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter extension dev",
+    "build": "pnpm --filter extension build",
+    "zip": "pnpm --filter extension zip",
+    "typecheck": "pnpm --filter extension exec tsc --noEmit"
+  },
+  "packageManager": "pnpm@11.10.0"
+}
