@@ -120,7 +120,7 @@ export default defineBackground(() => {
   chrome.tabs.onCreated.addListener((tab) => reindexTab(tab));
 
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === 'complete' || changeInfo.title || changeInfo.url || changeInfo.favIconUrl) {
+    if (changeInfo.status === 'complete' || changeInfo.groupId !== undefined || changeInfo.title || changeInfo.url || changeInfo.favIconUrl) {
       reindexTab(tab);
     }
   });
@@ -194,24 +194,79 @@ export default defineBackground(() => {
         if (typeof chrome.tabs.group !== 'function') return { type: 'ok' }; // unsupported browser
         const [gFirst, ...gRest] = msg.tabIds;
         if (gFirst == null) return { type: 'ok' };
-        const groupId = await chrome.tabs.group({
-          tabIds: [gFirst, ...gRest] as [number, ...number[]],
-        });
-        try {
-          await chrome.tabGroups.update(groupId, { title: 'Tabhound', color: 'blue' });
-        } catch {
-          /* tabGroups permission may not be granted */
+        const tabIds = [gFirst, ...gRest] as [number, ...number[]];
+        const reindexAll = async () => {
+          for (const id of tabIds) {
+            const t = await chrome.tabs.get(id).catch(() => undefined);
+            if (t) reindexTab(t);
+          }
+        };
+        if (msg.target.kind === 'existing') {
+          // Tabs from other windows are moved into the group's window.
+          await chrome.tabs.group({ tabIds, groupId: msg.target.groupId });
+          await reindexAll();
+          return { type: 'ok' };
         }
+        const first = await chrome.tabs.get(gFirst);
+        const groupId = await chrome.tabs.group({
+          tabIds,
+          createProperties: { windowId: first.windowId },
+        });
+        await chrome.tabGroups.update(groupId, {
+          title: msg.target.title,
+          color: msg.target.color,
+        });
+        await reindexAll();
         return { type: 'ok' };
       }
       case 'moveToNewWindow': {
         const [first, ...rest] = msg.tabIds;
         if (first == null) return { type: 'ok' };
+
+        // Moving a tab to another window drops it from its group, so remember each group's
+        // look now (Chrome deletes a group once it is empty) and rebuild it in the new window.
+        const canGroup = typeof chrome.tabs.group === 'function' && !!chrome.tabGroups;
+        const regroup = new Map<number, { tabIds: number[]; title: string; color: string }>();
+        if (canGroup) {
+          for (const id of msg.tabIds) {
+            const t = await chrome.tabs.get(id).catch(() => undefined);
+            if (!t || t.groupId == null || t.groupId < 0) continue;
+            let entry = regroup.get(t.groupId);
+            if (!entry) {
+              const g = await chrome.tabGroups.get(t.groupId).catch(() => undefined);
+              entry = { tabIds: [], title: g?.title ?? '', color: g?.color ?? 'grey' };
+              regroup.set(t.groupId, entry);
+            }
+            entry.tabIds.push(id);
+          }
+        }
+
         const win = await new Promise<chrome.windows.Window | undefined>((resolve) => {
           chrome.windows.create({ tabId: first }, (w) => resolve(w));
         });
         if (rest.length && win?.id != null) {
           await chrome.tabs.move(rest, { windowId: win.id, index: -1 });
+        }
+
+        if (win?.id != null) {
+          for (const g of regroup.values()) {
+            const [head, ...tail] = g.tabIds;
+            if (head == null) continue;
+            try {
+              const groupId = await chrome.tabs.group({
+                tabIds: [head, ...tail] as [number, ...number[]],
+                createProperties: { windowId: win.id },
+              });
+              await chrome.tabGroups.update(groupId, {
+                title: g.title,
+                color: g.color as chrome.tabGroups.Color,
+              });
+            } catch {
+              /* e.g. pinned tabs can't be grouped; the move itself already worked */
+            }
+          }
+          const moved = await Promise.all(msg.tabIds.map((id) => chrome.tabs.get(id).catch(() => undefined)));
+          for (const t of moved) if (t) reindexTab(t);
         }
         return { type: 'ok' };
       }

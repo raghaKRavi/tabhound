@@ -10,7 +10,22 @@ export type SearchResponse = { type: 'search'; results: TabDoc[] };
 export type FocusRequest = { type: 'focus'; tabId: number; windowId: number };
 export type CloseOthersRequest = { type: 'closeOthers'; keepTabIds: number[] };
 export type CloseSelectedRequest = { type: 'closeSelected'; tabIds: number[] };
-export type GroupRequest = { type: 'group'; tabIds: number[] };
+export type GroupColor =
+  | 'grey'
+  | 'blue'
+  | 'red'
+  | 'yellow'
+  | 'green'
+  | 'pink'
+  | 'purple'
+  | 'cyan'
+  | 'orange';
+
+export type GroupTarget =
+  | { kind: 'new'; title: string; color: GroupColor }
+  | { kind: 'existing'; groupId: number };
+
+export type GroupRequest = { type: 'group'; tabIds: number[]; target: GroupTarget };
 export type MoveToNewWindowRequest = { type: 'moveToNewWindow'; tabIds: number[] };
 
 export type EnableContentRequest = { type: 'enableContent' };

@@ -3,6 +3,7 @@ import MiniSearch from 'minisearch';
 export type TabDoc = {
   tabId: number;
   windowId: number;
+  groupId: number; // -1 = not in a group
   title: string;
   url: string;
   favIconUrl?: string;
@@ -77,6 +78,7 @@ export function tabToDoc(
   return {
     tabId: tab.id,
     windowId: tab.windowId,
+    groupId: tab.groupId ?? existing?.groupId ?? -1,
     title: tab.title ?? existing?.title ?? '',
     url: tab.url ?? tab.pendingUrl ?? existing?.url ?? '',
     favIconUrl: tab.favIconUrl ?? existing?.favIconUrl,
