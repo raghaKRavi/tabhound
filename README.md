@@ -79,6 +79,8 @@ pnpm build:firefox    # Firefox                      → .output/firefox-mv3/
 pnpm zip / zip:edge / zip:firefox   # store-ready zips (Firefox also writes the AMO sources zip)
 ```
 
+**Versions.** The manifest `version` comes from `apps/extension/package.json`. Local Chromium builds also get a `version_name` such as `0.1.0+ea091f9-dirty` (git commit, `-dirty` if uncommitted), shown on the extensions page so you can tell which build is loaded. Zips and Firefox builds carry only the clean version. Before each store upload run `pnpm bump patch` (or `minor` / `major`); stores reject a version that isn't higher than the last.
+
 Supported: Chrome, Edge, Brave, Vivaldi, Arc, Firefox 140+. Not targeted: Safari, Opera.
 Publishing material lives in [docs/](./docs): [PRIVACY.md](./docs/PRIVACY.md), [BUILD.md](./docs/BUILD.md), [store/LISTING.md](./docs/store/LISTING.md).
 

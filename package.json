@@ -10,7 +10,8 @@
     "build:edge": "pnpm --filter extension build:edge",
     "build:firefox": "pnpm --filter extension build:firefox",
     "zip:edge": "pnpm --filter extension zip:edge",
-    "zip:firefox": "pnpm --filter extension zip:firefox"
+    "zip:firefox": "pnpm --filter extension zip:firefox",
+    "bump": "node scripts/bump.mjs"
   },
   "packageManager": "pnpm@11.10.0"
 }

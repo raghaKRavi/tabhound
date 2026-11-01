@@ -1,15 +1,36 @@
+import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'wxt';
 import preact from '@preact/preset-vite';
+
+// Build label for local builds, e.g. "a1b2c3d" or "a1b2c3d-dirty". Empty without git.
+function gitLabel(): string {
+  try {
+    const run = (cmd: string) =>
+      execSync(cmd, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+    const sha = run('git rev-parse --short HEAD');
+    return run('git status --porcelain') ? `${sha}-dirty` : sha;
+  } catch {
+    return '';
+  }
+}
+
+// Store packages (`wxt zip`) must carry the clean version, and AMO sources must rebuild identically.
+const isZip = process.argv.includes('zip');
+const version: string = JSON.parse(readFileSync('package.json', 'utf8')).version;
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   manifestVersion: 3,
   manifest: ({ browser }) => {
     const firefox = browser === 'firefox';
+    const label = isZip || firefox ? '' : gitLabel();
     return {
       name: 'Tabhound',
       description:
         'Find any open tab across all windows by title or URL, then jump to it, group tabs, or close the rest.',
+      // Shown on the extensions page so you can tell which local build is loaded.
+      ...(label && { version_name: `${version}+${label}` }),
       author: 'Ragha Ravi',
       homepage_url: 'https://github.com/raghaKRavi/tabhound',
       permissions: [
@@ -51,7 +72,11 @@ export default defineConfig({
     // WXT auto-adds the runtime content script's matches as required host
     // permissions; ours must stay optional (granted by the user in the popup).
     'build:manifestGenerated': (_wxt, manifest) => {
-      delete manifest.host_permissions;
+      // Keep the dev-server (localhost) entries WXT adds in dev mode; extension pages need them to
+      // load scripts from the dev server. Production builds have none, so nothing is left there.
+      const local = (manifest.host_permissions ?? []).filter((h: string) => /localhost|127.0.0.1/.test(h));
+      if (local.length) manifest.host_permissions = local;
+      else delete manifest.host_permissions;
       if (!manifest.content_scripts?.length) delete manifest.content_scripts;
     },
   },

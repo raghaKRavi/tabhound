@@ -339,3 +339,310 @@
   color: var(--text-danger);
   border-color: var(--border-danger);
 }
+
+.grouppanel {
+  padding: 10px 12px;
+  border-top: 0.5px solid var(--border-tertiary);
+  background: var(--bg-secondary);
+  font-size: 12px;
+  max-height: 260px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.grouppanel .gp-title {
+  margin: 0 0 8px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.grouppanel .gp-sub {
+  margin: 10px 0 4px;
+  color: var(--text-secondary);
+}
+.grouppanel .gp-new {
+  display: flex;
+  gap: 6px;
+}
+.grouppanel input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  font: inherit;
+  border: 0.5px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+.grouppanel button {
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+.grouppanel button.primary {
+  padding: 6px 10px;
+  border: 0.5px solid var(--border-info);
+  border-radius: var(--radius-md);
+  background: var(--bg-info);
+  color: var(--text-info);
+}
+.gp-colors {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.dot {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  flex: none;
+  display: inline-block;
+}
+button.dot.on {
+  border-color: var(--text-primary);
+}
+.gp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.gp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  text-align: left;
+}
+.gp-item:hover {
+  background: var(--bg-info);
+}
+.gp-item .gp-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gp-item .gp-win {
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+.gp-cancel {
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-secondary) !important;
+  text-decoration: underline;
+}
+.gc-grey { --gc: #9aa0a6; }
+.gc-blue { --gc: #1a73e8; }
+.gc-red { --gc: #d93025; }
+.gc-yellow { --gc: #f9ab00; }
+.gc-green { --gc: #1e8e3e; }
+.gc-pink { --gc: #d01884; }
+.gc-purple { --gc: #9334e6; }
+.gc-cyan { --gc: #007b83; }
+.gc-orange { --gc: #fa903e; }
+
+.dot {
+  background: var(--gc, var(--text-tertiary));
+}
+.row.ingroup {
+  border-left: 3px solid var(--gc);
+  border-radius: 2px var(--radius-md) var(--radius-md) 2px;
+}
+.row.nested {
+  margin-left: 12px;
+}
+.grouphead {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 6px 0 2px;
+  padding: 0 6px 0 8px;
+  border-radius: var(--radius-md);
+}
+.grouphead:hover {
+  background: var(--bg-secondary);
+}
+.grouphead .gh-check {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  cursor: pointer;
+}
+.grouphead .gh-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0 4px 4px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.grouphead svg {
+  transition: transform 0.12s;
+  color: var(--text-tertiary);
+}
+.grouphead.collapsed svg {
+  transform: rotate(-90deg);
+}
+.grouphead .gh-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.grouphead .gh-win,
+.grouphead .gh-count {
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+/* ── group section: header + tree guide line ───────────────── */
+.grouphead {
+  margin: 12px 0 2px;
+  padding: 3px 8px 3px 12px; /* checkbox centre lines up with ungrouped rows' */
+  background: color-mix(in srgb, var(--gc) 14%, var(--bg-primary));
+  border-radius: var(--radius-md);
+}
+.grouphead:hover {
+  background: color-mix(in srgb, var(--gc) 22%, var(--bg-primary));
+}
+.grouphead .gh-check {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--text-info);
+}
+.grouphead .gh-toggle {
+  font-size: 13px;
+  font-weight: 600;
+}
+.grouphead .dot {
+  width: 11px;
+  height: 11px;
+}
+
+/* tabs inside a group: continuous guide line in the group colour, lighter rows */
+.row.nested {
+  margin: 0 0 0 14px;
+  padding: 1px 0 1px 6px;
+  border-left: 2px solid var(--gc);
+  border-radius: 0;
+}
+.row.nested .checkzone {
+  padding: 0 8px;
+  background: transparent;
+}
+.row.nested .checkzone:hover {
+  background: var(--bg-secondary);
+}
+.row.nested .checkzone.checked {
+  background: var(--bg-info);
+}
+
+.grouppanel .gp-filter {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+}
+.gp-list.scroll {
+  max-height: 112px; /* about three rows, then scroll */
+  overflow-y: auto;
+}
+.gp-none {
+  margin: 4px 8px;
+  color: var(--text-tertiary);
+}
+
+/* ── group header: same look as a tab row, colour lives in the name ── */
+.grouphead {
+  gap: 4px;
+  margin: 8px 0 2px;
+  padding: 0;
+  background: none;
+}
+.grouphead:hover {
+  background: none;
+}
+.grouphead .gh-toggle {
+  padding: 9px 10px 9px 8px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+}
+.grouphead .gh-toggle:hover {
+  background: #e8e5db;
+}
+.grouphead .gh-name {
+  /* darkened so light colours (yellow, orange) stay readable on beige */
+  color: color-mix(in srgb, var(--gc) 78%, #000);
+}
+.grouphead .dot {
+  width: 10px;
+  height: 10px;
+}
+
+/* breathing room where a group ends */
+.row.nested.last {
+  margin-bottom: 12px;
+}
+
+/* header checkbox box fills the full header height, like a tab row's */
+.grouphead {
+  align-items: stretch;
+}
+
+/* checkbox box looks the same everywhere: ungrouped rows, group headers, grouped rows */
+.row.nested .checkzone {
+  padding: 0 12px;
+  background: var(--bg-secondary);
+}
+.row.nested .checkzone:hover {
+  background: #dfe9f5;
+}
+.row.nested .checkzone.checked {
+  background: var(--bg-info);
+}
+.grouphead .gh-toggle:focus-visible {
+  outline: 2px solid var(--border-info);
+  outline-offset: -2px;
+}
+
+/* one vertical rhythm: every row and header is 2px apart; only the end of an
+   expanded group (.row.nested.last) gets extra space */
+.grouphead {
+  margin: 0 0 2px;
+}
+
+/* ── single spacing value: every gap in the list is --gap ───── */
+.results {
+  --gap: 4px;
+}
+.row {
+  margin-bottom: var(--gap);
+}
+.grouphead {
+  margin: 0 0 var(--gap);
+}
+/* grouped rows: the gap sits inside the row so the guide line stays unbroken */
+.row.nested {
+  margin: 0 0 0 14px;
+  padding: 0 0 var(--gap) 6px;
+}
+.row.nested.last {
+  padding-bottom: 0;
+  margin-bottom: var(--gap);
+}
