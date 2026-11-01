@@ -1,5 +1,6 @@
 import { TabStore, tabToDoc } from '@/lib/tab-index';
 import type {
+  BackgroundToContent,
   ContentToBackground,
   PopupToBackground,
   BackgroundResponse,
@@ -9,6 +10,80 @@ export default defineBackground(() => {
   const store = new TabStore();
   let ready: Promise<void>;
 
+  // ── opt-in content search ─────────────────────────────
+  const CS_ID = 'tabhound-meta';
+  const CS_FILE = 'content-scripts/content.js';
+  const ALL_URLS = { origins: ['<all_urls>'] };
+
+  const hasHostAccess = () => chrome.permissions.contains(ALL_URLS).catch(() => false);
+
+  async function registerContentScript() {
+    const existing = await chrome.scripting.getRegisteredContentScripts({ ids: [CS_ID] });
+    if (existing.length) return;
+    await chrome.scripting.registerContentScripts([
+      {
+        id: CS_ID,
+        js: [CS_FILE],
+        matches: ['http://*/*', 'https://*/*'],
+        runAt: 'document_idle',
+        persistAcrossSessions: true,
+      },
+    ]);
+  }
+
+  async function unregisterContentScript() {
+    try {
+      await chrome.scripting.unregisterContentScripts({ ids: [CS_ID] });
+    } catch {
+      /* not registered */
+    }
+  }
+
+  // Keep registration in line with the permission (e.g. user revoked it in browser settings).
+  async function syncContentScript(): Promise<boolean> {
+    if (await hasHostAccess()) {
+      await registerContentScript();
+      return true;
+    }
+    await unregisterContentScript();
+    return false;
+  }
+
+  // Run the script in tabs that were already open when the user opted in.
+  async function injectIntoOpenTabs() {
+    const tabs = await chrome.tabs.query({ url: ['http://*/*', 'https://*/*'] });
+    await Promise.all(
+      tabs.map((t) =>
+        t.id == null
+          ? undefined
+          : chrome.scripting
+              .executeScript({ target: { tabId: t.id }, files: [CS_FILE] })
+              .catch(() => {
+                /* restricted page (e.g. web store) or tab gone */
+              }),
+      ),
+    );
+  }
+
+  // Ask already-injected tabs to re-report description/h1 after an index rebuild.
+  async function requestMetaFromTabs(tabs: chrome.tabs.Tab[]) {
+    await Promise.all(
+      tabs.map((t) =>
+        t.id == null
+          ? undefined
+          : chrome.tabs
+              .sendMessage(t.id, { type: 'requestMeta' } satisfies BackgroundToContent)
+              .catch(() => {
+                /* no content script in this tab */
+              }),
+      ),
+    );
+  }
+
+  function clearAllMeta() {
+    for (const d of store.all()) store.upsert({ ...d, description: '', h1: '' });
+  }
+
   async function rebuildFromScratch() {
     store.clear();
     const tabs = await chrome.tabs.query({});
@@ -16,11 +91,19 @@ export default defineBackground(() => {
       const doc = tabToDoc(t);
       if (doc) store.upsert(doc);
     }
+    if (await syncContentScript()) void requestMetaFromTabs(tabs);
   }
 
   function scheduleRebuild() {
     ready = rebuildFromScratch();
   }
+
+  chrome.permissions.onRemoved.addListener((p) => {
+    if (p.origins?.length) {
+      void unregisterContentScript();
+      clearAllMeta();
+    }
+  });
 
   function reindexTab(tab: chrome.tabs.Tab) {
     const existing = tab.id != null ? store.get(tab.id) : undefined;
@@ -122,6 +205,17 @@ export default defineBackground(() => {
         if (rest.length && win?.id != null) {
           await chrome.tabs.move(rest, { windowId: win.id, index: -1 });
         }
+        return { type: 'ok' };
+      }
+      case 'enableContent': {
+        if (!(await hasHostAccess())) return { type: 'ok' };
+        await registerContentScript();
+        await injectIntoOpenTabs();
+        return { type: 'ok' };
+      }
+      case 'disableContent': {
+        await unregisterContentScript();
+        clearAllMeta();
         return { type: 'ok' };
       }
       case 'meta': {

@@ -13,6 +13,9 @@ export type CloseSelectedRequest = { type: 'closeSelected'; tabIds: number[] };
 export type GroupRequest = { type: 'group'; tabIds: number[] };
 export type MoveToNewWindowRequest = { type: 'moveToNewWindow'; tabIds: number[] };
 
+export type EnableContentRequest = { type: 'enableContent' };
+export type DisableContentRequest = { type: 'disableContent' };
+
 export type MetaReport = { type: 'meta'; meta: PageMeta };
 
 export type PopupToBackground =
@@ -22,8 +25,13 @@ export type PopupToBackground =
   | CloseOthersRequest
   | CloseSelectedRequest
   | GroupRequest
-  | MoveToNewWindowRequest;
+  | MoveToNewWindowRequest
+  | EnableContentRequest
+  | DisableContentRequest;
 
 export type ContentToBackground = MetaReport;
+
+// background -> content script (via tabs.sendMessage)
+export type BackgroundToContent = { type: 'requestMeta' };
 
 export type BackgroundResponse = ListResponse | SearchResponse | { type: 'ok' };

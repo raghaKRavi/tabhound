@@ -57,14 +57,6 @@ function chromeFavicon(url: string, size = 32): string {
   return u.toString();
 }
 
-function duckFavicon(url: string): string | null {
-  try {
-    return `https://icons.duckduckgo.com/ip3/${new URL(url).hostname}.ico`;
-  } catch {
-    return null;
-  }
-}
-
 function isInternalUrl(url: string): boolean {
   return (
     url.startsWith('chrome://') ||
@@ -79,10 +71,9 @@ function Favicon({ url, favIconUrl }: { url: string; favIconUrl?: string }) {
   const chain = useMemo(() => {
     if (isInternalUrl(url)) return [];
     const list: string[] = [];
+    // Chrome's local favicon cache first (no network); Firefox has no such endpoint.
+    if (!import.meta.env.FIREFOX) list.push(chromeFavicon(url));
     if (favIconUrl) list.push(favIconUrl);
-    list.push(chromeFavicon(url));
-    const duck = duckFavicon(url);
-    if (duck) list.push(duck);
     return list;
   }, [url, favIconUrl]);
 
@@ -117,7 +108,30 @@ export function App() {
   const [highlighted, setHighlighted] = useState(0);
   const [focusedInput, setFocusedInput] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [contentOn, setContentOn] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    chrome.permissions
+      .contains({ origins: ['<all_urls>'] })
+      .then(setContentOn)
+      .catch(() => setContentOn(false));
+  }, []);
+
+  // permissions.request must run directly from the click (user gesture).
+  const toggleContent = useCallback(async () => {
+    const origins = ['<all_urls>'];
+    if (contentOn) {
+      await send({ type: 'disableContent' });
+      await chrome.permissions.remove({ origins });
+      setContentOn(false);
+      return;
+    }
+    const granted = await chrome.permissions.request({ origins });
+    if (!granted) return;
+    setContentOn(true);
+    await send({ type: 'enableContent' });
+  }, [contentOn]);
 
   useEffect(() => {
     send<ListResponse>({ type: 'list' }).then((r) => {
@@ -321,6 +335,15 @@ export function App() {
             );
           })
         )}
+      </div>
+
+      <div class="contentbar">
+        <span>
+          {contentOn
+            ? 'Searching page descriptions & headings. Stays on this device.'
+            : 'Also search page descriptions & headings (needs access to all sites).'}
+        </span>
+        <button onClick={toggleContent}>{contentOn ? 'Turn off' : 'Turn on'}</button>
       </div>
 
       {selectedCount > 0 && (
