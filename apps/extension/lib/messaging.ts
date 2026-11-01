@@ -1,10 +1,39 @@
 import type { TabDoc } from './tab-index';
+import type { PageMeta } from './meta';
+
+export type ListRequest = { type: 'list' };
+export type ListResponse = { type: 'list'; tabs: TabDoc[]; windowCount: number };
 
 export type SearchRequest = { type: 'search'; query: string };
 export type SearchResponse = { type: 'search'; results: TabDoc[] };
 
 export type FocusRequest = { type: 'focus'; tabId: number; windowId: number };
 export type CloseOthersRequest = { type: 'closeOthers'; keepTabIds: number[] };
+export type CloseSelectedRequest = { type: 'closeSelected'; tabIds: number[] };
+export type GroupRequest = { type: 'group'; tabIds: number[] };
+export type MoveToNewWindowRequest = { type: 'moveToNewWindow'; tabIds: number[] };
 
-export type PopupToBackground = SearchRequest | FocusRequest | CloseOthersRequest;
-export type BackgroundToPopup = SearchResponse;
+export type EnableContentRequest = { type: 'enableContent' };
+export type DisableContentRequest = { type: 'disableContent' };
+
+export type MetaReport = { type: 'meta'; meta: PageMeta };
+
+export type PopupToBackground =
+  | ListRequest
+  | SearchRequest
+  | FocusRequest
+  | CloseOthersRequest
+  | CloseSelectedRequest
+  | GroupRequest
+  | MoveToNewWindowRequest
+  | EnableContentRequest
+  | DisableContentRequest;
+
+export type ContentToBackground = MetaReport;
+
+// background -> content script (via tabs.sendMessage)
+export type BackgroundToContent = { type: 'requestMeta' };
+
+export type ErrorResponse = { type: 'error'; message: string };
+
+export type BackgroundResponse = ListResponse | SearchResponse | ErrorResponse | { type: 'ok' };

@@ -6,7 +6,11 @@
     "dev": "pnpm --filter extension dev",
     "build": "pnpm --filter extension build",
     "zip": "pnpm --filter extension zip",
-    "typecheck": "pnpm --filter extension exec tsc --noEmit"
+    "typecheck": "pnpm --filter extension exec tsc --noEmit",
+    "build:edge": "pnpm --filter extension build:edge",
+    "build:firefox": "pnpm --filter extension build:firefox",
+    "zip:edge": "pnpm --filter extension zip:edge",
+    "zip:firefox": "pnpm --filter extension zip:firefox"
   },
   "packageManager": "pnpm@11.10.0"
 }

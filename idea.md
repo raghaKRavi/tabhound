@@ -12,11 +12,19 @@ instead of manually clicking through every tab to find the one you want.
 
 ### Features
 1. **Search & focus** — search open tabs, click a result to switch to that tab.
-2. **Multi-select close** — select the tabs you want to keep, click "close
-   others" → closes everything *except* the selected set. (Chrome's built-in
-   "Close other tabs" only keeps one tab; this keeps multiple.)
+2. **Multi-select actions** — check any set of tabs, then act on them in bulk:
+   - **Close others** — closes everything *except* the selected set. (Chrome's
+     built-in "Close other tabs" only keeps one tab; this keeps multiple.)
+   - **Group** — put the selected tabs into a named tab group.
+   - **Move to new window** — pull the selected tabs out into their own window.
+   - **Open** — focus a single selected tab.
 3. **Cross-window** — works across all windows of the same profile (incl. a tab
    dragged out into a new window).
+
+### UX reference
+Design to follow: [`design/popup-mockup.html`](design/popup-mockup.html) —
+open it in a browser to see the target look & feel. Spec captured below in the
+"Popup UX spec" section. Keep implementation faithful to this mockup.
 
 ---
 
@@ -27,6 +35,8 @@ instead of manually clicking through every tab to find the one you want.
 | List tabs, search by title/URL, click to focus | ✅ | `chrome.tabs` API |
 | Search meta description + h1 | ✅ | tiny content script |
 | Close all tabs *except* multiple selected | ✅ | `chrome.tabs.remove([...])` |
+| Group selected tabs into a named group | ✅ | `chrome.tabs.group()` + `chrome.tabGroups.update()` (needs `tabGroups` perm) |
+| Move selected tabs to a new window | ✅ | `chrome.windows.create({tabId})` + `chrome.tabs.move()` |
 | One profile, many windows (incl. dragged-out tab) | ✅ | `chrome.tabs.query({})` spans all windows |
 | Full page-content search + summarize | ⚠️ v2 | bigger content script + index |
 | Two *different* profiles / same profile on two *machines* | ❌ v3 | isolated sandboxes — needs a backend |
@@ -42,8 +52,8 @@ separate profiles or separate machines need a sync backend.
 - **TypeScript** + **Manifest V3**
 - **WXT** (`npx wxt@latest init`) — extension framework, removes boilerplate,
   cross-browser (Chrome/Edge/Firefox) from one codebase
+- **React 18** — popup UI
 - **MiniSearch** — in-memory full-text search (fuzzy, prefix, field boosting)
-- UI: plain TS or Preact/Svelte (tiny popup)
 
 ---
 
@@ -74,12 +84,28 @@ handles actions: focus tab + raise its window, multi-close.
 
 **Content script** (cheap) grabs only lightweight metadata per page.
 
-**Popup UI** = search box + result rows + checkboxes + "Open" / "Close others".
+**Popup UI** = search box + result rows + checkboxes + action bar
+("Open" / "Group" / "New window" / "Close others"). See "Popup UX spec" below.
 
-### Focus a tab in another window
+### Bulk actions on selected tabs
 ```ts
+// Focus a tab in another window
 await chrome.tabs.update(tabId, { active: true });
 await chrome.windows.update(windowId, { focused: true }); // raises the other window
+
+// Close all EXCEPT the selected set
+const keep = new Set(selectedIds);
+const toClose = allTabs.filter(t => !keep.has(t.id)).map(t => t.id);
+await chrome.tabs.remove(toClose);
+
+// Group the selected tabs (needs "tabGroups" permission)
+const groupId = await chrome.tabs.group({ tabIds: selectedIds });
+await chrome.tabGroups.update(groupId, { title: 'TabHound', color: 'blue' });
+
+// Move the selected tabs into a brand-new window
+const [first, ...rest] = selectedIds;
+const win = await chrome.windows.create({ tabId: first });
+if (rest.length) await chrome.tabs.move(rest, { windowId: win.id, index: -1 });
 ```
 
 ### v1 indexes per tab
@@ -118,6 +144,38 @@ startup     → chrome.tabs.query({}) rebuilds whole index
 ### Permissions
 - v1-lite (title+URL only): `tabs`, `storage` — easiest store review
 - v1-meta (adds description+h1): `tabs`, `storage`, `scripting` + host perms
+- Bulk actions add: `tabGroups` (for the Group action)
+
+---
+
+## Popup UX spec
+
+Reference file to build against: [`design/popup-mockup.html`](design/popup-mockup.html).
+Fixed popup size ~**380 × 520px**.
+
+**States**
+1. **Empty query** → show all tabs grouped by window; header shows
+   "N tabs · M windows".
+2. **Active query** → ranked results, matched term highlighted (`<mark>`),
+   result count caption.
+3. **1+ selected** → action bar appears at the bottom.
+
+**Layout (top → bottom)**
+- **Header** — "TabHound" + live "24 tabs · 3 windows" count.
+- **Search box** — focused style, search icon, clear (`×`) button.
+- **Result rows** — each: checkbox · favicon · title (with match highlight) ·
+  url · window badge (`win 1/2/3`). Row hover + selected states.
+- **Action bar** (when 1+ checked) — "N selected" + a primary **Open** button
+  and an **Actions ▾** dropdown holding the bulk actions:
+  **Group tabs** · **Move to new window** · (separator) · **Close all others**
+  (danger styling). Dropdown keeps the bar clean at 380px width.
+
+**Interactions**
+- Type → live filter. `↑/↓` move highlight, `Enter` opens highlighted, `Esc`
+  clears query. `Space` toggles the highlighted row's checkbox.
+- Click a row (not the checkbox) → focus that tab, close popup.
+- Open → focus the single checked tab. Group / New window / Close others → act
+  on the checked set, then close popup.
 
 ---
 
@@ -135,13 +193,15 @@ startup     → chrome.tabs.query({}) rebuilds whole index
 
 ## Roadmap / build order
 
-- [ ] **v1** — WXT + TS + MiniSearch. List tabs, fuzzy search title+URL+meta,
-      focus across windows, multi-select close. Single profile. No backend.
-  - [ ] Scaffold: `npx wxt@latest init`
+- [ ] **v1** — WXT + React + TS + MiniSearch. List tabs, fuzzy search
+      title+URL+meta, focus across windows, bulk actions. Single profile.
+      No backend. Build to match [`design/popup-mockup.html`](design/popup-mockup.html).
+  - [ ] Scaffold: `npx wxt@latest init` (React + TypeScript)
   - [ ] Service worker: tab list + index + storage persistence
   - [ ] Content script: grab title/description/h1 metadata
   - [ ] Popup UI: search box + results + focus action
-  - [ ] Multi-select + "close all except selected"
+  - [ ] Bulk actions: close others · group · move to new window
+  - [ ] Keyboard nav (↑/↓/Enter/Esc/Space)
   - [ ] Load unpacked in Chrome, test
   - [ ] Publish to Chrome Web Store
 - [ ] **v2** — full page-content extraction + summarization (same pipeline,

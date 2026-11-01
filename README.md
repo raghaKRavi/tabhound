@@ -73,9 +73,14 @@ Edits to source files auto-reload the extension. Content-script edits require re
 ## Production build
 
 ```powershell
-pnpm build           # → apps/extension/.output/chrome-mv3/
-pnpm zip             # → zipped artifact for Chrome Web Store submission
+pnpm build            # Chrome, Brave, Vivaldi, Arc  → apps/extension/.output/chrome-mv3/
+pnpm build:edge       # Edge                         → .output/edge-mv3/
+pnpm build:firefox    # Firefox                      → .output/firefox-mv3/
+pnpm zip / zip:edge / zip:firefox   # store-ready zips (Firefox also writes the AMO sources zip)
 ```
+
+Supported: Chrome, Edge, Brave, Vivaldi, Arc, Firefox 140+. Not targeted: Safari, Opera.
+Publishing material lives in [docs/](./docs): [PRIVACY.md](./docs/PRIVACY.md), [BUILD.md](./docs/BUILD.md), [store/LISTING.md](./docs/store/LISTING.md).
 
 ## Typecheck
 
@@ -85,4 +90,11 @@ pnpm typecheck
 
 ## Permissions
 
-The manifest requests: `tabs`, `storage`, `scripting`, and `<all_urls>` host permission. These are needed to enumerate open tabs across windows, persist the search index, and inject the tiny content script that reads each page's `<title>`, `meta[name=description]`, and first `<h1>`.
+| Permission | Why |
+|---|---|
+| `tabs` | Read tab titles/URLs; focus, close, group, move tabs |
+| `tabGroups`, `favicon` (Chromium only) | Tab groups; local favicon cache |
+| `scripting` | Register the content script after the user opts in |
+| `<all_urls>` (**optional**) | Requested only when the user turns on content search in the popup; reads each page's `meta[name=description]` and first `<h1>` |
+
+Nothing leaves the device. See [docs/PRIVACY.md](./docs/PRIVACY.md).
