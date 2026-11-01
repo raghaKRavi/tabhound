@@ -82,7 +82,7 @@ endpoint. The Firefox build will warn about an unknown permission and icons will
 
 ---
 
-## 4. [ ] `tabGroups` unsupported in Firefox
+## 4. [x] `tabGroups` unsupported in Firefox
 
 **Where:** `wxt.config.ts`, `entrypoints/background.ts` (`case 'group'`), popup group button
 
@@ -98,7 +98,7 @@ different behavior. The group action throws or silently fails.
 
 ---
 
-## 5. [ ] Firefox manifest requirements missing
+## 5. [x] Firefox manifest requirements missing
 
 **Where:** `wxt.config.ts`
 
@@ -118,7 +118,7 @@ Firefox build output and fix all errors/warnings.
 
 ---
 
-## 6. [ ] No privacy policy
+## 6. [x] No privacy policy
 
 **Problem:** Chrome Web Store requires a privacy policy URL for extensions that handle URLs /
 browsing activity (this one reads all tab titles and URLs). AMO expects a clear disclosure too.
@@ -174,3 +174,38 @@ Removed `duckFavicon()`; popup makes no third-party requests.
 - `favicon` permission is now Chrome-only (per-browser manifest in `wxt.config.ts`).
 - Popup favicon order: Chrome → `/_favicon/` (local cache) then `tab.favIconUrl`; Firefox → `tab.favIconUrl` only; both fall back to the globe icon. The `_favicon` code is dead-code-eliminated from the Firefox bundle.
 - Verified: Firefox manifest has no `favicon`; Chrome unchanged. Remaining Firefox warnings are blocker 5.
+
+### Targets (decision)
+Chrome, Edge, Brave, Vivaldi, Arc (Chromium build), and Firefox. **Safari and Opera are out of scope.**
+Scripts: `build`, `build:edge`, `build:firefox`, `zip`, `zip:edge`, `zip:firefox`.
+
+### Blocker 3 (revised)
+Popup no longer sniffs the browser. It checks `chrome.runtime.getManifest().permissions` for `favicon`, so any build that declares it uses the local favicon cache.
+
+### Blocker 4 – done
+`tabGroups` is declared only on Chromium builds. The popup hides "Group tabs" when `chrome.tabs.group` / `chrome.tabGroups` don't exist (runtime detection); background also guards the call.
+
+### Blocker 5 – done
+- `manifestVersion: 3` forced for all browsers (WXT defaulted Firefox to MV2).
+- Firefox manifest: `browser_specific_settings.gecko` with a generated permanent ID `{ec888a38-1813-442c-9c55-f58391b01c69}`, `strict_min_version 140.0`, `data_collection_permissions: { required: ['none'] }`.
+- Chrome, Edge and Firefox builds produce no WXT warnings. `web-ext lint`: 0 errors; one remaining warning is Preact's own innerHTML handling (library code, accepted by AMO).
+- Keep that gecko ID forever; changing it after the first AMO upload makes a new add-on.
+
+### Blocker 6 – drafted
+`docs/PRIVACY.md` written. **Remaining:** fill in the contact line, host at a public URL (e.g. GitHub Pages or the repo's rendered page), paste the URL into both store dashboards, and make the dashboard "privacy practices" answers match it.
+
+### Blocker 6 – done (all targets)
+- `docs/PRIVACY.md` contact = GitHub issues URL. Policy URL for all stores: `https://github.com/raghaKRavi/tabhound/blob/main/docs/PRIVACY.md` (repo must be public + `main` pushed).
+- `docs/store/LISTING.md`: shared copy, single purpose, per-permission justifications, Chrome data-usage answers, Edge and AMO notes, Brave/Vivaldi/Arc note.
+- `docs/BUILD.md` + sources zip now ships the whole workspace (lockfile, base tsconfig, docs). **Verified:** unzipped into an empty folder, `pnpm install --frozen-lockfile && pnpm build:firefox` reproduces byte-identical `manifest.json`, `background.js`, `content.js`.
+
+### "Also required" list – done
+- LICENSE (MIT, 2026 Ragha Ravi); `author` + `homepage_url` in manifest; manifest description rewritten (≤132 chars).
+- Removed `public/wxt.svg`, `assets/react.svg`, stray `apps/extension/package-lock.json`, template README, `manifest.type` meta.
+- Name unified to "Tabhound" (popup header, group title, action title).
+- Errors: background now replies `{type:'error'}`; popup shows a dismissible banner instead of silently closing. `onAttached` wrapped in try/catch.
+- "Close all others" asks for confirmation (shows how many tabs will close).
+- Clean rebuilds of Chrome, Edge, Firefox; zips for Chrome, Edge, Firefox(+sources).
+
+### Still manual
+Screenshots + 440×280 promo tile (list in `docs/store/LISTING.md`), make repo public and push `main`, create store developer accounts (Chrome one-time $5, Edge free, AMO free), per-browser smoke test (Edge, Brave, Vivaldi, Firefox).

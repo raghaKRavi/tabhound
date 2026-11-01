@@ -128,8 +128,12 @@ export default defineBackground(() => {
   chrome.tabs.onRemoved.addListener((tabId) => store.remove(tabId));
 
   chrome.tabs.onAttached.addListener(async (tabId) => {
-    const tab = await chrome.tabs.get(tabId);
-    reindexTab(tab);
+    try {
+      const tab = await chrome.tabs.get(tabId);
+      reindexTab(tab);
+    } catch {
+      /* tab may be gone */
+    }
   });
   chrome.tabs.onDetached.addListener(async (tabId) => {
     try {
@@ -147,7 +151,10 @@ export default defineBackground(() => {
         .then((res) => sendResponse(res))
         .catch((err) => {
           console.error('[tabhound]', err);
-          sendResponse({ type: 'ok' } as BackgroundResponse);
+          sendResponse({
+            type: 'error',
+            message: err instanceof Error ? err.message : 'Something went wrong.',
+          } as BackgroundResponse);
         });
       return true; // async
     },
@@ -184,13 +191,14 @@ export default defineBackground(() => {
         return { type: 'ok' };
       }
       case 'group': {
+        if (typeof chrome.tabs.group !== 'function') return { type: 'ok' }; // unsupported browser
         const [gFirst, ...gRest] = msg.tabIds;
         if (gFirst == null) return { type: 'ok' };
         const groupId = await chrome.tabs.group({
           tabIds: [gFirst, ...gRest] as [number, ...number[]],
         });
         try {
-          await chrome.tabGroups.update(groupId, { title: 'TabHound', color: 'blue' });
+          await chrome.tabGroups.update(groupId, { title: 'Tabhound', color: 'blue' });
         } catch {
           /* tabGroups permission may not be granted */
         }

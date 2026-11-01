@@ -34,4 +34,6 @@ export type ContentToBackground = MetaReport;
 // background -> content script (via tabs.sendMessage)
 export type BackgroundToContent = { type: 'requestMeta' };
 
-export type BackgroundResponse = ListResponse | SearchResponse | { type: 'ok' };
+export type ErrorResponse = { type: 'error'; message: string };
+
+export type BackgroundResponse = ListResponse | SearchResponse | ErrorResponse | { type: 'ok' };

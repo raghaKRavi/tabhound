@@ -6,6 +6,7 @@ import type {
   BackgroundResponse,
   CloseOthersRequest,
   CloseSelectedRequest,
+  ErrorResponse,
   FocusRequest,
   GroupRequest,
   ListResponse,
@@ -20,7 +21,9 @@ function send<T extends BackgroundResponse>(msg: PopupToBackground): Promise<T> 
     chrome.runtime.sendMessage(msg, (res) => {
       const err = chrome.runtime.lastError;
       if (err) reject(err);
-      else resolve(res as T);
+      else if ((res as BackgroundResponse | undefined)?.type === 'error') {
+        reject(new Error((res as ErrorResponse).message));
+      } else resolve(res as T);
     });
   });
 }
@@ -44,6 +47,12 @@ function highlight(text: string, query: string): JSX.Element {
   }
   return <>{parts}</>;
 }
+
+// Capability checks, not browser sniffing: the manifest only declares
+// `favicon` / `tabGroups` where the browser supports them.
+const canUseFaviconApi = (chrome.runtime.getManifest().permissions ?? []).includes('favicon');
+const canGroupTabs =
+  typeof chrome.tabs?.group === 'function' && typeof chrome.tabGroups?.update === 'function';
 
 function chromeFavicon(url: string, size = 32): string {
   const u = new URL(chrome.runtime.getURL('/_favicon/'));
@@ -71,8 +80,8 @@ function Favicon({ url, favIconUrl }: { url: string; favIconUrl?: string }) {
   const chain = useMemo(() => {
     if (isInternalUrl(url)) return [];
     const list: string[] = [];
-    // Chrome's local favicon cache first (no network); Firefox has no such endpoint.
-    if (!import.meta.env.FIREFOX) list.push(chromeFavicon(url));
+    // Browser's local favicon cache first (no network) where available.
+    if (canUseFaviconApi) list.push(chromeFavicon(url));
     if (favIconUrl) list.push(favIconUrl);
     return list;
   }, [url, favIconUrl]);
@@ -178,11 +187,26 @@ export function App() {
     });
   }, []);
 
-  const openTab = useCallback(async (doc: TabDoc) => {
-    const msg: FocusRequest = { type: 'focus', tabId: doc.tabId, windowId: doc.windowId };
-    await send(msg);
-    window.close();
+  const [error, setError] = useState<string | null>(null);
+  const [confirmOthers, setConfirmOthers] = useState(false);
+
+  // Runs a background action; closes the popup on success, shows the error otherwise.
+  const runAction = useCallback(async (msg: PopupToBackground) => {
+    try {
+      await send(msg);
+      window.close();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Something went wrong.');
+    }
   }, []);
+
+  const openTab = useCallback(
+    (doc: TabDoc) => {
+      const msg: FocusRequest = { type: 'focus', tabId: doc.tabId, windowId: doc.windowId };
+      return runAction(msg);
+    },
+    [runAction],
+  );
 
   const openSelected = useCallback(async () => {
     const [id] = [...selected];
@@ -191,37 +215,33 @@ export function App() {
     if (doc) await openTab(doc);
   }, [selected, displayedTabs, tabs, openTab]);
 
-  const closeSelected = useCallback(async () => {
+  const closeSelected = useCallback(() => {
     const tabIds = [...selected];
     if (!tabIds.length) return;
     const msg: CloseSelectedRequest = { type: 'closeSelected', tabIds };
-    await send(msg);
-    window.close();
-  }, [selected]);
+    return runAction(msg);
+  }, [selected, runAction]);
 
-  const closeOthers = useCallback(async () => {
+  const closeOthers = useCallback(() => {
     const keepTabIds = [...selected];
     if (!keepTabIds.length) return;
     const msg: CloseOthersRequest = { type: 'closeOthers', keepTabIds };
-    await send(msg);
-    window.close();
-  }, [selected]);
+    return runAction(msg);
+  }, [selected, runAction]);
 
-  const groupTabs = useCallback(async () => {
+  const groupTabs = useCallback(() => {
     const tabIds = [...selected];
     if (!tabIds.length) return;
     const msg: GroupRequest = { type: 'group', tabIds };
-    await send(msg);
-    window.close();
-  }, [selected]);
+    return runAction(msg);
+  }, [selected, runAction]);
 
-  const moveToNewWindow = useCallback(async () => {
+  const moveToNewWindow = useCallback(() => {
     const tabIds = [...selected];
     if (!tabIds.length) return;
     const msg: MoveToNewWindowRequest = { type: 'moveToNewWindow', tabIds };
-    await send(msg);
-    window.close();
-  }, [selected]);
+    return runAction(msg);
+  }, [selected, runAction]);
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -263,7 +283,7 @@ export function App() {
         <span class="icon">
           <Icon name="search" size={18} />
         </span>
-        <span class="title">TabHound</span>
+        <span class="title">Tabhound</span>
         <span class="count">{headerCount}</span>
       </div>
 
@@ -346,6 +366,27 @@ export function App() {
         <button onClick={toggleContent}>{contentOn ? 'Turn off' : 'Turn on'}</button>
       </div>
 
+      {error && (
+        <div class="errorbar" role="alert">
+          <span>{error}</span>
+          <button onClick={() => setError(null)}>Dismiss</button>
+        </div>
+      )}
+
+      {confirmOthers && (
+        <div class="errorbar confirm" role="alertdialog">
+          <span>
+            Close {Math.max(allTabs.length - selectedCount, 0)} other tab
+            {allTabs.length - selectedCount === 1 ? '' : 's'}? Only the {selectedCount} selected will
+            stay open.
+          </span>
+          <button onClick={() => setConfirmOthers(false)}>Cancel</button>
+          <button class="danger" onClick={closeOthers}>
+            Close them
+          </button>
+        </div>
+      )}
+
       {selectedCount > 0 && (
         <div class="actionbar">
           <span class="count">{selectedCount} selected</span>
@@ -367,15 +408,23 @@ export function App() {
             </button>
             {menuOpen && (
               <div class="menu">
-                <button class="menu-item" onClick={groupTabs}>
-                  <Icon name="grid-add" size={15} />
-                  Group tabs
-                </button>
+                {canGroupTabs && (
+                  <button class="menu-item" onClick={groupTabs}>
+                    <Icon name="grid-add" size={15} />
+                    Group tabs
+                  </button>
+                )}
                 <button class="menu-item" onClick={moveToNewWindow}>
                   <Icon name="app-window" size={15} />
                   Move to new window
                 </button>
-                <button class="menu-item danger" onClick={closeOthers}>
+                <button
+                  class="menu-item danger"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setConfirmOthers(true);
+                  }}
+                >
                   <Icon name="x" size={15} />
                   Close all others
                 </button>
