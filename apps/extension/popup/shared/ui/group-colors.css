@@ -1,0 +1,25 @@
+/* Tab-group colours (Chrome's palette). Elements with .gc-<colour> expose it as --gc. */
+.gc-grey { --gc: #9aa0a6; }
+.gc-blue { --gc: #1a73e8; }
+.gc-red { --gc: #d93025; }
+.gc-yellow { --gc: #f9ab00; }
+.gc-green { --gc: #1e8e3e; }
+.gc-pink { --gc: #d01884; }
+.gc-purple { --gc: #9334e6; }
+.gc-cyan { --gc: #007b83; }
+.gc-orange { --gc: #fa903e; }
+
+/* Round colour swatch; also used as a <button> in the colour picker. */
+.dot {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  flex: none;
+  display: inline-block;
+  background: var(--gc, var(--text-tertiary));
+}
+button.dot.on {
+  border-color: var(--text-primary);
+}

@@ -84,6 +84,24 @@ pnpm zip / zip:edge / zip:firefox   # store-ready zips (Firefox also writes the 
 Supported: Chrome, Edge, Brave, Vivaldi, Arc, Firefox 140+. Not targeted: Safari, Opera.
 Publishing material lives in [docs/](./docs): [PRIVACY.md](./docs/PRIVACY.md), [BUILD.md](./docs/BUILD.md), [store/LISTING.md](./docs/store/LISTING.md).
 
+## Tests
+
+```powershell
+pnpm test            # run once (Vitest + jsdom + Testing Library)
+pnpm --filter extension test:watch
+```
+
+Tests sit next to the code as `*.test.ts(x)`. Pure logic (`buildRows`, the tab index, URL and name helpers), the hooks and the popup components are covered; `test/setup.ts` stubs the `chrome` APIs and `test/factories.ts` builds sample tabs and groups. The background script is not unit tested yet.
+
+## Git hooks
+
+[Husky](https://typicode.github.io/husky) runs checks locally and stops the git command if they fail:
+
+- **pre-commit:** `pnpm test` (the unit tests, a few seconds)
+- **pre-push:** `pnpm verify` (typecheck, tests, production build)
+
+ The hook is installed by `pnpm install` (the `prepare` script). Run the full check any time with `pnpm verify`; skip a hook once with `git commit --no-verify` or `git push --no-verify`.
+
 ## Typecheck
 
 ```powershell

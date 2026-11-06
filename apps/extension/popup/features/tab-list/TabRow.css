@@ -1,0 +1,89 @@
+.row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  border-radius: var(--radius-md);
+  user-select: none;
+  margin-bottom: var(--gap);
+}
+
+.row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 8px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.row.highlighted .row-body,
+.row-body:hover {
+  background: var(--bg-secondary);
+}
+
+.fav {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: var(--bg-primary);
+  border: 0.5px solid var(--border-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.fav img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.row .meta {
+  flex: 1;
+  min-width: 0;
+}
+.row .row-title {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row .row-url {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin: 1px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row mark {
+  background: var(--bg-warning);
+  color: var(--text-warning);
+  padding: 0 1px;
+  border-radius: 3px;
+}
+
+/* In a group while searching: coloured stripe on the left. */
+.row.ingroup {
+  border-left: 3px solid var(--gc);
+  border-radius: 2px var(--radius-md) var(--radius-md) 2px;
+}
+
+/* Listed under a group header: unbroken guide line in the group colour. The gap below sits
+   inside the row (as padding) so the line has no breaks. */
+.row.nested {
+  margin: 0 0 0 14px;
+  padding: 0 0 var(--gap) 6px;
+  border-left: 2px solid var(--gc);
+  border-radius: 0;
+}
+.row.nested.last {
+  padding-bottom: 0;
+  margin-bottom: var(--gap);
+}

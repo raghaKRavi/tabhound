@@ -1,0 +1,9 @@
+/* Popup shell: fixed width column; each feature styles its own part. */
+.popup {
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  min-height: 520px;
+  max-height: 600px;
+  background: var(--bg-primary);
+}

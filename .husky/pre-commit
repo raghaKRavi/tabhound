@@ -1,0 +1,3 @@
+# Runs before every `git commit`; a failing test stops the commit.
+# Skip once with: git commit --no-verify
+pnpm test
