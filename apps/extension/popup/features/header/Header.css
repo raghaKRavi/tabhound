@@ -1,0 +1,21 @@
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 0.5px solid var(--border-tertiary);
+  flex-shrink: 0;
+}
+.head .title {
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+.head .count {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.head .icon {
+  font-size: 18px;
+  color: var(--text-tertiary);
+}

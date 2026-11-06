@@ -14,6 +14,8 @@ pnpm build:firefox     # -> apps/extension/.output/firefox-mv3  (Firefox)
 pnpm build             # -> apps/extension/.output/chrome-mv3    (Chrome, Brave, Vivaldi, Arc)
 pnpm build:edge        # -> apps/extension/.output/edge-mv3      (Edge)
 ```
+Optional: `pnpm test` runs the unit tests; they are not needed to build.
+
 Store packages: `pnpm zip`, `pnpm zip:edge`, `pnpm zip:firefox`. The Firefox zip step also
 writes `extension-<version>-sources.zip`, the archive uploaded to AMO.
 

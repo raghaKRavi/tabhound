@@ -1,0 +1,60 @@
+.grouphead {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  margin: 0 0 var(--gap);
+  border-radius: var(--radius-md);
+}
+
+.grouphead .gh-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  padding: 9px 10px 9px 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+}
+.grouphead .gh-toggle:hover {
+  background: #e8e5db;
+}
+.grouphead .gh-toggle:focus-visible {
+  outline: 2px solid var(--border-info);
+  outline-offset: -2px;
+}
+
+.grouphead svg {
+  transition: transform 0.12s;
+  color: var(--text-tertiary);
+}
+.grouphead.collapsed svg {
+  transform: rotate(-90deg);
+}
+
+.grouphead .dot {
+  width: 10px;
+  height: 10px;
+}
+
+.grouphead .gh-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* darkened so light colours (yellow, orange) stay readable on beige */
+  color: color-mix(in srgb, var(--gc) 78%, #000);
+}
+.grouphead .gh-win,
+.grouphead .gh-count {
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}

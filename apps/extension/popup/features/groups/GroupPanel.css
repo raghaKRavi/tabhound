@@ -1,0 +1,99 @@
+.grouppanel {
+  padding: 10px 12px;
+  border-top: 0.5px solid var(--border-tertiary);
+  background: var(--bg-secondary);
+  font-size: 12px;
+  max-height: 260px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.grouppanel .gp-title {
+  margin: 0 0 8px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.grouppanel .gp-sub {
+  margin: 10px 0 4px;
+  color: var(--text-secondary);
+}
+.grouppanel .gp-new {
+  display: flex;
+  gap: 6px;
+}
+.grouppanel input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  font: inherit;
+  border: 0.5px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+.grouppanel .gp-filter {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+}
+.grouppanel button {
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+.grouppanel button.primary {
+  padding: 6px 10px;
+  border: 0.5px solid var(--border-info);
+  border-radius: var(--radius-md);
+  background: var(--bg-info);
+  color: var(--text-info);
+}
+.gp-colors {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.gp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.gp-list.scroll {
+  max-height: 112px; /* about three rows, then scroll */
+  overflow-y: auto;
+}
+.gp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  text-align: left;
+}
+.gp-item:hover {
+  background: var(--bg-info);
+}
+.gp-item .gp-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gp-item .gp-win {
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+.gp-none {
+  margin: 4px 8px;
+  color: var(--text-tertiary);
+}
+.gp-cancel {
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-secondary) !important;
+  text-decoration: underline;
+}

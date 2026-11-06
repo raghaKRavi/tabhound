@@ -1,0 +1,25 @@
+.checkzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+.checkzone:hover {
+  background: #dfe9f5;
+}
+.checkzone.checked {
+  background: var(--bg-info);
+}
+.checkzone input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--text-info);
+  cursor: pointer;
+  pointer-events: none;
+}

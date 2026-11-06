@@ -1,0 +1,84 @@
+.actionbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border-top: 0.5px solid var(--border-tertiary);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+.actionbar .count {
+  font-size: 11px;
+  color: var(--text-secondary);
+  flex: 1;
+}
+.actionbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  padding: 6px 10px;
+  background: var(--bg-primary);
+  border: 0.5px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-family: inherit;
+}
+.actionbar button:hover {
+  background: var(--bg-secondary);
+}
+.actionbar button.danger {
+  color: var(--text-danger);
+  border-color: var(--border-danger);
+}
+
+.menu-wrap {
+  position: relative;
+}
+.menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  background: var(--bg-primary);
+  border: 0.5px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  min-width: 180px;
+  padding: 0;
+  overflow: hidden;
+}
+.menu button.menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 12px;
+  border: none;
+  background: none;
+  border-radius: 0;
+  text-align: left;
+  justify-content: flex-start;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+.menu button.menu-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 0.5px;
+  background: var(--border-tertiary);
+}
+.menu button.menu-item:hover {
+  background: var(--bg-secondary);
+}
+.menu button.menu-item.danger {
+  color: var(--text-danger);
+}

@@ -11,7 +11,13 @@
     "build:firefox": "pnpm --filter extension build:firefox",
     "zip:edge": "pnpm --filter extension zip:edge",
     "zip:firefox": "pnpm --filter extension zip:firefox",
-    "bump": "node scripts/bump.mjs"
+    "bump": "node scripts/bump.mjs",
+    "test": "pnpm --filter extension test",
+    "prepare": "husky",
+    "verify": "pnpm typecheck && pnpm test && pnpm build"
   },
-  "packageManager": "pnpm@11.10.0"
+  "packageManager": "pnpm@11.10.0",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
 }
