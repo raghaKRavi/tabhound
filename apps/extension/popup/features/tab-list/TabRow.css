@@ -87,3 +87,10 @@
   padding-bottom: 0;
   margin-bottom: var(--gap);
 }
+
+/* pin icon at the right end of a pinned tab's row */
+.row .pinmark {
+  flex: none;
+  display: flex;
+  color: var(--text-tertiary);
+}

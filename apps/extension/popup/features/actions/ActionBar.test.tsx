@@ -2,14 +2,18 @@ import { fireEvent, render, screen } from '@testing-library/preact';
 import { describe, expect, it, vi } from 'vitest';
 import { ActionBar } from './ActionBar';
 
-function setup(selectedCount = 2) {
+function setup(selectedCount = 2, over: Partial<Parameters<typeof ActionBar>[0]> = {}) {
   const props = {
     selectedCount,
+    allPinned: false,
+    pinLeavesGroup: false,
+    onTogglePin: vi.fn(),
     onOpen: vi.fn(),
     onCloseSelected: vi.fn(),
     onGroup: vi.fn(),
     onMoveToNewWindow: vi.fn(),
     onCloseOthers: vi.fn(),
+    ...over,
   };
   render(<ActionBar {...props} />);
   return props;
@@ -48,6 +52,7 @@ describe('ActionBar', () => {
 
   it.each([
     ['Group tabs', 'onGroup'],
+    ['Pin tabs', 'onTogglePin'],
     ['Move to new window', 'onMoveToNewWindow'],
     ['Close all others', 'onCloseOthers'],
   ] as const)('runs "%s" and closes the menu', (label, handler) => {
@@ -59,6 +64,34 @@ describe('ActionBar', () => {
     expect(screen.queryByText(label)).toBeNull();
   });
 
+  describe('pinning', () => {
+    it('offers "Pin tabs" unless every selected tab is already pinned', () => {
+      setup(2, { allPinned: false });
+      openMenu();
+      expect(screen.getByText('Pin tabs')).toBeTruthy();
+      expect(screen.queryByText('Unpin tabs')).toBeNull();
+    });
+
+    it('offers "Unpin tabs" when every selected tab is pinned', () => {
+      setup(2, { allPinned: true });
+      openMenu();
+      expect(screen.getByText('Unpin tabs')).toBeTruthy();
+      expect(screen.queryByText('Pin tabs')).toBeNull();
+    });
+
+    it('warns that pinning takes grouped tabs out of their group', () => {
+      setup(2, { pinLeavesGroup: true });
+      openMenu();
+      expect(screen.getByText('Pin tabs').closest('button')!.title).toBe('Pinned tabs leave their group');
+    });
+
+    it('has no warning when nothing selected is in a group, or when unpinning', () => {
+      setup(2, { pinLeavesGroup: false });
+      openMenu();
+      expect(screen.getByText('Pin tabs').closest('button')!.title).toBe('');
+    });
+  });
+
   it('hides "Group tabs" where the browser has no tab groups', async () => {
     vi.resetModules();
     const original = chrome.tabGroups;
@@ -68,6 +101,9 @@ describe('ActionBar', () => {
     render(
       <Fresh
         selectedCount={2}
+        allPinned={false}
+        pinLeavesGroup={false}
+        onTogglePin={() => {}}
         onOpen={() => {}}
         onCloseSelected={() => {}}
         onGroup={() => {}}

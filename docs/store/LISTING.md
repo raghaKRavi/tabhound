@@ -23,6 +23,7 @@ Find any open tab across all windows by title or URL, then jump to it, group tab
 >
 > • Fuzzy, instant search across all windows
 > • Select several tabs, then close everything else (browser built-ins keep only one)
+> • Pin or unpin selected tabs; pinned tabs are listed first
 > • Group selected tabs, or move them into a new window (where your browser supports tab groups)
 > • Optional content search: also match each page's description and main heading. Off by default;
 >   you turn it on in the popup and can turn it off any time

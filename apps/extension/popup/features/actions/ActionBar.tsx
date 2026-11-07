@@ -5,6 +5,11 @@ import './ActionBar.css';
 
 type Props = {
   selectedCount: number;
+  /** Every selected tab is already pinned, so the menu offers "Unpin". */
+  allPinned: boolean;
+  /** Some selected tab is in a group; pinning will take it out. */
+  pinLeavesGroup: boolean;
+  onTogglePin: () => void;
   onOpen: () => void;
   onCloseSelected: () => void;
   onGroup: () => void;
@@ -15,6 +20,9 @@ type Props = {
 /** Bar of bulk actions shown while tabs are selected. */
 export function ActionBar({
   selectedCount,
+  allPinned,
+  pinLeavesGroup,
+  onTogglePin,
   onOpen,
   onCloseSelected,
   onGroup,
@@ -54,6 +62,14 @@ export function ActionBar({
                 Group tabs
               </button>
             )}
+            <button
+              class="menu-item"
+              onClick={pick(onTogglePin)}
+              title={!allPinned && pinLeavesGroup ? 'Pinned tabs leave their group' : undefined}
+            >
+              <Icon name="pin" size={15} />
+              {allPinned ? 'Unpin tabs' : 'Pin tabs'}
+            </button>
             <button class="menu-item" onClick={pick(onMoveToNewWindow)}>
               <Icon name="app-window" size={15} />
               Move to new window

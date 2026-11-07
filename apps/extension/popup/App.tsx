@@ -52,6 +52,13 @@ export function App() {
     [allTabs, selection.ids],
   );
 
+  const selectedTabs = useMemo(
+    () => allTabs.filter((t) => selection.selected.has(t.tabId)),
+    [allTabs, selection.selected],
+  );
+  const allPinned = selectedTabs.length > 0 && selectedTabs.every((t) => t.pinned);
+  const pinLeavesGroup = selectedTabs.some((t) => t.groupId >= 0);
+
   return (
     <div class="popup" onKeyDown={onKeyDown}>
       <Header tabCount={tabs.length} windowCount={totalWindows} />
@@ -104,6 +111,9 @@ export function App() {
       {selection.count > 0 && (
         <ActionBar
           selectedCount={selection.count}
+          allPinned={allPinned}
+          pinLeavesGroup={pinLeavesGroup}
+          onTogglePin={() => actions.setPinned(!allPinned)}
           onOpen={actions.openSelected}
           onCloseSelected={actions.closeSelected}
           onGroup={() => setOverlay('group')}

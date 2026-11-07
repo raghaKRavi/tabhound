@@ -81,6 +81,11 @@ describe('tabToDoc', () => {
     expect(tabToDoc(chromeTab({ id: 1, windowId: 1 }))?.groupId).toBe(-1);
   });
 
+  it('records whether the tab is pinned, defaulting to not pinned', () => {
+    expect(tabToDoc(chromeTab({ id: 1, windowId: 1, pinned: true }))?.pinned).toBe(true);
+    expect(tabToDoc(chromeTab({ id: 1, windowId: 1 }))?.pinned).toBe(false);
+  });
+
   it('returns null for tabs without an id or window', () => {
     expect(tabToDoc(chromeTab({ windowId: 1 }))).toBeNull();
     expect(tabToDoc(chromeTab({ id: 1 }))).toBeNull();

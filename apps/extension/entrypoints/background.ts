@@ -120,7 +120,7 @@ export default defineBackground(() => {
   chrome.tabs.onCreated.addListener((tab) => reindexTab(tab));
 
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === 'complete' || changeInfo.groupId !== undefined || changeInfo.title || changeInfo.url || changeInfo.favIconUrl) {
+    if (changeInfo.status === 'complete' || changeInfo.groupId !== undefined || changeInfo.pinned !== undefined || changeInfo.title || changeInfo.url || changeInfo.favIconUrl) {
       reindexTab(tab);
     }
   });
@@ -267,6 +267,14 @@ export default defineBackground(() => {
           }
           const moved = await Promise.all(msg.tabIds.map((id) => chrome.tabs.get(id).catch(() => undefined)));
           for (const t of moved) if (t) reindexTab(t);
+        }
+        return { type: 'ok' };
+      }
+      case 'pin': {
+        // Browsers take a pinned tab out of its group, so reindex to pick up both changes.
+        for (const id of msg.tabIds) {
+          const tab = await chrome.tabs.update(id, { pinned: msg.pinned });
+          if (tab) reindexTab(tab);
         }
         return { type: 'ok' };
       }
