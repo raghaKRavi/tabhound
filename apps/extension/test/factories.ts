@@ -10,6 +10,7 @@ export function makeTab(overrides: Partial<TabDoc> = {}): TabDoc {
     tabId: id,
     windowId: 1,
     groupId: -1,
+    pinned: false,
     title: `Tab ${id}`,
     url: `https://example.com/${id}`,
     description: '',

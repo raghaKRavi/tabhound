@@ -60,12 +60,23 @@ describe('useTabActions', () => {
     });
   });
 
+  it('pins and unpins the selected tabs', async () => {
+    const { result } = renderHook(() => useTabActions([1, 2], tabs));
+
+    await act(() => result.current.setPinned(true));
+    expect(send).toHaveBeenLastCalledWith({ type: 'pin', tabIds: [1, 2], pinned: true });
+
+    await act(() => result.current.setPinned(false));
+    expect(send).toHaveBeenLastCalledWith({ type: 'pin', tabIds: [1, 2], pinned: false });
+  });
+
   it('does nothing when no tab is selected', async () => {
     const { result } = renderHook(() => useTabActions([], tabs));
     await act(async () => {
       await result.current.closeSelected();
       await result.current.closeOthers();
       await result.current.moveToNewWindow();
+      await result.current.setPinned(true);
       await result.current.groupInto({ kind: 'existing', groupId: 1 });
     });
     expect(send).not.toHaveBeenCalled();

@@ -80,6 +80,34 @@ describe('TabList', () => {
     expect(screen.getByText('No tabs match your search.')).toBeTruthy();
   });
 
+  it('marks pinned tabs with a pin and leaves other tabs unmarked', () => {
+    const pinned = makeTab({ tabId: 9, title: 'Pinned one', pinned: true });
+    const plain = makeTab({ tabId: 10, title: 'Plain one' });
+    const { rows } = buildRows({ tabs: [plain, pinned], query: '', groupById: new Map(), collapsed: new Set() });
+    render(
+      <TabList
+        rows={rows}
+        matchCount={2}
+        query=""
+        selected={new Set()}
+        highlighted={0}
+        windowLabels={new Map([[1, 1]])}
+        totalWindows={1}
+        onHighlight={() => {}}
+        onToggleTab={() => {}}
+        onToggleGroup={() => {}}
+        onToggleCollapse={() => {}}
+        onOpen={() => {}}
+      />,
+    );
+
+    const rowOf = (title: string) => screen.getByText(title).closest('.row') as HTMLElement;
+    expect(within(rowOf('Pinned one')).getByLabelText('Pinned')).toBeTruthy();
+    expect(within(rowOf('Plain one')).queryByLabelText('Pinned')).toBeNull();
+    // pinned tab is listed first
+    expect(document.querySelector('.row')!.textContent).toContain('Pinned one');
+  });
+
   it('opens a tab when its row is clicked', () => {
     const { onOpen, tabs } = setup();
     fireEvent.click(screen.getByText('Gamma'));

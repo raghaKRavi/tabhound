@@ -92,6 +92,39 @@ describe('buildRows', () => {
     expect(rows[0]).toMatchObject({ color: undefined });
   });
 
+  it('lists pinned tabs first, keeping their order, ahead of groups and other tabs', () => {
+    const g = makeGroup({ id: 7 });
+    const loose = makeTab();
+    const grouped = makeTab({ groupId: 7 });
+    const [pinA, pinB] = [makeTab({ pinned: true }), makeTab({ pinned: true })];
+    const { rows, visibleTabs } = buildRows({
+      tabs: [loose, grouped, pinA, pinB],
+      query: '',
+      groupById: groupMap(g),
+      collapsed: none,
+    });
+
+    expect(rows.map((r) => (r.kind === 'header' ? 'H' : r.doc.tabId))).toEqual([
+      pinA.tabId,
+      pinB.tabId,
+      loose.tabId,
+      'H',
+      grouped.tabId,
+    ]);
+    expect(visibleTabs.map((t) => t.tabId)).toEqual([pinA.tabId, pinB.tabId, loose.tabId, grouped.tabId]);
+  });
+
+  it('keeps relevance order while searching, even for pinned tabs', () => {
+    const [plain, pinned] = [makeTab(), makeTab({ pinned: true })];
+    const { visibleTabs } = buildRows({
+      tabs: [plain, pinned],
+      query: 'x',
+      groupById: new Map(),
+      collapsed: none,
+    });
+    expect(visibleTabs).toEqual([plain, pinned]);
+  });
+
   it('treats a whitespace-only query as no query', () => {
     const g = makeGroup({ id: 7 });
     const { rows } = buildRows({

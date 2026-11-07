@@ -4,6 +4,7 @@ export type TabDoc = {
   tabId: number;
   windowId: number;
   groupId: number; // -1 = not in a group
+  pinned: boolean;
   title: string;
   url: string;
   favIconUrl?: string;
@@ -79,6 +80,7 @@ export function tabToDoc(
     tabId: tab.id,
     windowId: tab.windowId,
     groupId: tab.groupId ?? existing?.groupId ?? -1,
+    pinned: tab.pinned ?? existing?.pinned ?? false,
     title: tab.title ?? existing?.title ?? '',
     url: tab.url ?? tab.pendingUrl ?? existing?.url ?? '',
     favIconUrl: tab.favIconUrl ?? existing?.favIconUrl,

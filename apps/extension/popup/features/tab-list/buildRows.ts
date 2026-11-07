@@ -40,13 +40,16 @@ export function buildRows({ tabs, query, groupById, collapsed }: Input) {
     return { rows, visibleTabs };
   }
 
+  // Pinned tabs come first, like the tab strip. They can never be in a group.
+  const ordered = [...tabs.filter((t) => t.pinned), ...tabs.filter((t) => !t.pinned)];
+
   const members = new Map<number, TabDoc[]>();
-  for (const t of tabs) {
+  for (const t of ordered) {
     if (groupOf(t)) members.set(t.groupId, [...(members.get(t.groupId) ?? []), t]);
   }
 
   const emitted = new Set<number>();
-  for (const t of tabs) {
+  for (const t of ordered) {
     const group = groupOf(t);
     if (!group) {
       addTab(t, undefined, false);

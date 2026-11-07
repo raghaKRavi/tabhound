@@ -2,6 +2,7 @@ import type { TabDoc } from '@/lib/tab-index';
 import { shortUrl } from '../../shared/lib/url';
 import { CheckZone } from '../../shared/ui/CheckZone';
 import { Highlight } from '../../shared/ui/Highlight';
+import { Icon } from '../../shared/ui/Icon';
 import '../../shared/ui/group-colors.css';
 import { Favicon } from './Favicon';
 import type { TabRowData } from './types';
@@ -49,6 +50,11 @@ export function TabRow({ row, query, selected, highlighted, onHover, onToggleSel
             <Highlight text={shortUrl(doc.url)} query={query} />
           </p>
         </div>
+        {doc.pinned && (
+          <span class="pinmark" title="Pinned" aria-label="Pinned">
+            <Icon name="pin" size={13} />
+          </span>
+        )}
       </div>
     </div>
   );
