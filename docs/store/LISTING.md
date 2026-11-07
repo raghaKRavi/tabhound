@@ -73,4 +73,4 @@ No separate listing: they install from the Chrome Web Store. Smoke-test the Chro
   windows, (2) multi-select with the action bar, (3) the "Close all others" confirmation,
   (4) content search turned on.
 - Chrome small promo tile 440×280 (required), marquee 1400×560 (optional). Edge: 300×300 logo, optional promo tiles.
-- Icons are already in `apps/extension/public/icon/` (128 px is used for the store).
+- Icons: the extension icons (16/32/48/96/128) are in `apps/extension/public/icon/`. For the store listings use `docs/store/assets/`: `store-icon-128.png` (padded 128 px icon for the Chrome/Edge store icon field), `logo-512.png` (Edge logo and any large placement) and `logo.svg` (vector source).
