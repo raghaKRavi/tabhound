@@ -17,7 +17,7 @@ pnpm build:edge        # -> apps/extension/.output/edge-mv3      (Edge)
 Optional: `pnpm test` runs the unit tests; they are not needed to build.
 
 Store packages: `pnpm zip`, `pnpm zip:edge`, `pnpm zip:firefox`. The Firefox zip step also
-writes `extension-<version>-sources.zip`, the archive uploaded to AMO.
+writes `tabhound-<version>-sources.zip`, the archive uploaded to AMO.
 
 The build is [WXT](https://wxt.dev) (Vite + Rolldown) compiling TypeScript and Preact. Bundled
 libraries: `preact` (UI) and `minisearch` (in-memory search). No code is fetched at runtime.

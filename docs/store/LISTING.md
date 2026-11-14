@@ -56,7 +56,7 @@ or lending. State that data stays on-device and is not transmitted.
 - Search terms: tabs, tab search, tab manager, find tab, close tabs.
 
 ## Firefox AMO
-- Upload `extension-<version>-firefox.zip` and `extension-<version>-sources.zip` (`pnpm zip:firefox`).
+- Upload `tabhound-<version>-firefox.zip` and `tabhound-<version>-sources.zip` (`pnpm zip:firefox`).
 - **Summary (≤250 chars):** same as short description.
 - **Data collection:** declared in the manifest as `none`. The policy URL above goes in the listing.
 - **Notes to reviewer:** paste the "Notes for reviewers" section of `docs/BUILD.md`, and add:
