@@ -52,7 +52,11 @@ export function useTabActions(selectedIds: number[], allTabs: TabDoc[]) {
     if (selectedIds.length) return run({ type: 'moveToNewWindow', tabIds: selectedIds });
   }, [selectedIds, run]);
 
-  const setPinned = useCallback(
+  const ungroup = useCallback(() => {
+    if (selectedIds.length) return run({ type: 'ungroup', tabIds: selectedIds });
+  }, [selectedIds, run]);
+
+  const setPinned =useCallback(
     (pinned: boolean) => {
       if (selectedIds.length) return run({ type: 'pin', tabIds: selectedIds, pinned });
     },
@@ -77,6 +81,7 @@ export function useTabActions(selectedIds: number[], allTabs: TabDoc[]) {
     closeTab,
     closeOthers,
     moveToNewWindow,
+    ungroup,
     setPinned,
     groupInto,
   };

@@ -219,6 +219,15 @@ export default defineBackground(() => {
         await reindexAll();
         return { type: 'ok' };
       }
+      case 'ungroup': {
+        if (typeof chrome.tabs.ungroup !== 'function' || !msg.tabIds.length) return { type: 'ok' };
+        await chrome.tabs.ungroup(msg.tabIds as [number, ...number[]]);
+        for (const id of msg.tabIds) {
+          const t = await chrome.tabs.get(id).catch(() => undefined);
+          if (t) reindexTab(t);
+        }
+        return { type: 'ok' };
+      }
       case 'moveToNewWindow': {
         const [first, ...rest] = msg.tabIds;
         if (first == null) return { type: 'ok' };

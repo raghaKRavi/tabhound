@@ -114,6 +114,26 @@
   color: var(--text-primary);
 }
 
+/* "2 of 4" badge on tabs that are open more than once */
+.row .dupmark {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--bg-warning);
+  color: var(--text-warning);
+  font-size: 10px;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+}
+.row .dupmark:hover {
+  filter: brightness(0.95);
+  outline: 1px solid var(--text-warning);
+}
+
 /* pin icon at the right end of a pinned tab's row */
 .row .pinmark {
   flex: none;

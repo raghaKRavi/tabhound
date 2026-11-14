@@ -23,6 +23,9 @@ export function useSelection() {
     });
   }, []);
 
+  /** Replaces the selection. */
+  const setAll = useCallback((ids: number[]) => setSelected(new Set(ids)), []);
+
   /** Forgets a tab (e.g. it was just closed). */
   const drop = useCallback((tabId: number) => {
     setSelected((prev) => {
@@ -35,5 +38,5 @@ export function useSelection() {
 
   const ids = useMemo(() => [...selected], [selected]);
 
-  return { selected, ids, count: selected.size, toggle, toggleMany, drop };
+  return { selected, ids, count: selected.size, toggle, toggleMany, setAll, drop };
 }

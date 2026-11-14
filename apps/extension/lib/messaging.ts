@@ -26,6 +26,7 @@ export type GroupTarget =
   | { kind: 'existing'; groupId: number };
 
 export type GroupRequest = { type: 'group'; tabIds: number[]; target: GroupTarget };
+export type UngroupRequest = { type: 'ungroup'; tabIds: number[] };
 export type MoveToNewWindowRequest = { type: 'moveToNewWindow'; tabIds: number[] };
 
 export type PinRequest = { type: 'pin'; tabIds: number[]; pinned: boolean };
@@ -41,6 +42,7 @@ export type PopupToBackground =
   | CloseOthersRequest
   | CloseSelectedRequest
   | GroupRequest
+  | UngroupRequest
   | MoveToNewWindowRequest
   | PinRequest
   | EnableContentRequest

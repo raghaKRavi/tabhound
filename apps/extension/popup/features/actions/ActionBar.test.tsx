@@ -64,6 +64,21 @@ describe('ActionBar', () => {
     expect(screen.queryByText(label)).toBeNull();
   });
 
+  describe('ungrouping', () => {
+    it('offers "Ungroup tabs" only when a selected tab is in a group', () => {
+      const props = setup(2, { anyGrouped: true, onUngroup: vi.fn() });
+      openMenu();
+      fireEvent.click(screen.getByText('Ungroup tabs'));
+      expect(props.onUngroup).toHaveBeenCalledTimes(1);
+    });
+
+    it('hides "Ungroup tabs" when none are grouped', () => {
+      setup(2, { anyGrouped: false, onUngroup: vi.fn() });
+      openMenu();
+      expect(screen.queryByText('Ungroup tabs')).toBeNull();
+    });
+  });
+
   describe('pinning', () => {
     it('offers "Pin tabs" unless every selected tab is already pinned', () => {
       setup(2, { allPinned: false });

@@ -40,6 +40,9 @@ describe('useTabActions', () => {
 
     await act(() => result.current.moveToNewWindow());
     expect(send).toHaveBeenLastCalledWith({ type: 'moveToNewWindow', tabIds: [1, 2] });
+
+    await act(() => result.current.ungroup());
+    expect(send).toHaveBeenLastCalledWith({ type: 'ungroup', tabIds: [1, 2] });
   });
 
   it('groups the selected tabs into a new or an existing group', async () => {

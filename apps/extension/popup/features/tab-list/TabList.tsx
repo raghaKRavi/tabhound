@@ -21,6 +21,9 @@ type Props = {
   onToggleCollapse: (groupId: number) => void;
   onOpen: (doc: TabDoc) => void;
   onClose?: (doc: TabDoc) => void;
+  /** tabId -> place within its duplicate set. */
+  dupBadges?: Map<number, { n: number; of: number }>;
+  onDupClick?: (doc: TabDoc) => void;
 };
 
 /** Scrollable list of tab rows and group headers. */
@@ -39,6 +42,8 @@ export function TabList({
   onToggleCollapse,
   onOpen,
   onClose,
+  dupBadges,
+  onDupClick,
 }: Props) {
   if (loading) {
     return (
@@ -75,6 +80,8 @@ export function TabList({
               onToggleSelect={onToggleTab}
               onOpen={onOpen}
               onClose={onClose}
+              dup={dupBadges?.get(row.doc.tabId)}
+              onDupClick={onDupClick}
             />
           ),
         )

@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 
 type Props = {
-  name: 'search' | 'x' | 'arrow-right' | 'chevron-down' | 'dots' | 'grid-add' | 'app-window' | 'world' | 'pin';
+  name: 'search' | 'x' | 'arrow-right' | 'chevron-down' | 'dots' | 'grid-add' | 'copy' | 'settings' | 'ungroup' | 'app-window' | 'world' | 'pin';
   size?: number;
   color?: string;
   strokeWidth?: number;
@@ -36,6 +36,28 @@ const PATHS: Record<Props['name'], ComponentChildren> = {
       <path d="M4 14h4a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-4a2 2 0 0 1 2 -2z" />
       <path d="M4 4h4a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-4a2 2 0 0 1 2 -2z" />
       <path d="M14 17h6M17 14v6" />
+    </>
+  ),
+  copy: (
+    <>
+      <path d="M9 9m0 2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2z" />
+      <path d="M5 15v-9a2 2 0 0 1 2 -2h9" />
+    </>
+  ),
+  settings: (
+    <>
+      <path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1" />
+      <path d="M15 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+      <path d="M9 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+      <path d="M17 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+    </>
+  ),
+  ungroup: (
+    <>
+      <path d="M14 4h4a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-4a2 2 0 0 1 2 -2z" />
+      <path d="M4 14h4a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-4a2 2 0 0 1 2 -2z" />
+      <path d="M4 4h4a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-4a2 2 0 0 1 2 -2z" />
+      <path d="M14 17h6" />
     </>
   ),
   'app-window': (
