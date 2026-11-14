@@ -64,6 +64,8 @@ export default defineConfig({
     };
   },
   zip: {
+    // Name the store zips tabhound-<version>-<browser>.zip (default is the package name, "extension").
+    name: 'tabhound',
     // AMO reviewers must rebuild from source: ship the whole workspace (lockfile, base tsconfig, docs).
     sourcesRoot: '../..',
     excludeSources: ['design/**', 'idea.md', 'docs/release-blockers/**', '**/*.zip'],
