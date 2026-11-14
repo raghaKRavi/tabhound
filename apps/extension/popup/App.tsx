@@ -14,6 +14,7 @@ import { useTabs } from './features/tabs/useTabs';
 import { TabList } from './features/tab-list/TabList';
 import { useHighlight } from './features/tab-list/useHighlight';
 import { useTabRows } from './features/tab-list/useTabRows';
+import type { TabDoc } from '@/lib/tab-index';
 import { NoticeBar } from './shared/ui/NoticeBar';
 import './App.css';
 
@@ -25,7 +26,7 @@ export function App() {
   const [query, setQuery] = useState('');
   const [overlay, setOverlay] = useState<Overlay>('none');
 
-  const { allTabs, tabs, windowLabels, totalWindows } = useTabs(query);
+  const { allTabs, tabs, windowLabels, totalWindows, loading, removeTab } = useTabs(query);
   const { groups, groupById } = useGroups();
   const { rows, visibleTabs, toggleCollapsed } = useTabRows(tabs, query, groupById);
   const selection = useSelection();
@@ -33,7 +34,17 @@ export function App() {
   const content = useContentSearch();
   const { highlighted, setHighlighted, move } = useHighlight(visibleTabs.length, [query, allTabs]);
 
-  const closeOverlay = useCallback(() => setOverlay('none'), []);
+  const closeOne = useCallback(
+    async (doc: TabDoc) => {
+      if (await actions.closeTab(doc.tabId)) {
+        removeTab(doc.tabId);
+        selection.drop(doc.tabId);
+      }
+    },
+    [actions.closeTab, removeTab, selection.drop],
+  );
+
+  const closeOverlay =useCallback(() => setOverlay('none'), []);
   const clearQuery = useCallback(() => setQuery(''), []);
 
   const onKeyDown = usePopupKeys({
@@ -66,6 +77,7 @@ export function App() {
 
       <TabList
         rows={rows}
+        loading={loading}
         matchCount={tabs.length}
         query={query}
         selected={selection.selected}
@@ -77,6 +89,7 @@ export function App() {
         onToggleGroup={selection.toggleMany}
         onToggleCollapse={toggleCollapsed}
         onOpen={actions.openTab}
+        onClose={closeOne}
       />
 
       <ContentSearchBar enabled={content.enabled} onToggle={content.toggle} />

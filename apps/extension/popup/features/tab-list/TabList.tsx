@@ -6,6 +6,8 @@ import './TabList.css';
 
 type Props = {
   rows: Row[];
+  /** True until the first tab list arrives; shows a centered spinner. */
+  loading?: boolean;
   /** Number of tabs matching the query (zero shows the empty message). */
   matchCount: number;
   query: string;
@@ -18,11 +20,13 @@ type Props = {
   onToggleGroup: (tabIds: number[]) => void;
   onToggleCollapse: (groupId: number) => void;
   onOpen: (doc: TabDoc) => void;
+  onClose?: (doc: TabDoc) => void;
 };
 
 /** Scrollable list of tab rows and group headers. */
 export function TabList({
   rows,
+  loading = false,
   matchCount,
   query,
   selected,
@@ -34,7 +38,15 @@ export function TabList({
   onToggleGroup,
   onToggleCollapse,
   onOpen,
+  onClose,
 }: Props) {
+  if (loading) {
+    return (
+      <div class="results results-loading" role="status" aria-label="Loading tabs">
+        <div class="spinner" />
+      </div>
+    );
+  }
   return (
     <div class="results">
       {matchCount === 0 ? (
@@ -62,6 +74,7 @@ export function TabList({
               onHover={() => onHighlight(row.index)}
               onToggleSelect={onToggleTab}
               onOpen={onOpen}
+              onClose={onClose}
             />
           ),
         )

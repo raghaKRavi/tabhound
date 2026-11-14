@@ -28,7 +28,7 @@ export default defineConfig({
     return {
       name: 'Tabhound',
       description:
-        'Find any open tab across all windows by title or URL, then jump to it, group tabs, or close the rest.',
+        'Tab search for all your windows: find a tab by title or URL, jump to it, group tabs, or close the rest. 100% private.',
       // Shown on the extensions page so you can tell which local build is loaded.
       ...(label && { version_name: `${version}+${label}` }),
       author: 'Ragha Ravi',

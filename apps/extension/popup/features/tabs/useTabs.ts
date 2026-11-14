@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
 import type { ListResponse, SearchResponse } from '@/lib/messaging';
 import type { TabDoc } from '@/lib/tab-index';
 import { send } from '../../shared/lib/messaging-client';
@@ -12,12 +12,19 @@ export function useTabs(query: string) {
   const [tabs, setTabs] = useState<TabDoc[]>([]);
   const [windowCount, setWindowCount] = useState(0);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    send<ListResponse>({ type: 'list' }).then((r) => {
-      setAllTabs(r.tabs);
-      setTabs(r.tabs);
-      setWindowCount(r.windowCount);
-    });
+    send<ListResponse>({ type: 'list' })
+      .then((r) => {
+        setAllTabs(r.tabs);
+        setTabs(r.tabs);
+        setWindowCount(r.windowCount);
+      })
+      .catch(() => {
+        /* background unavailable; show the empty state */
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -34,7 +41,13 @@ export function useTabs(query: string) {
     };
   }, [query, allTabs]);
 
-  /** windowId -> "Window N" number, in order of first appearance. */
+  /** Drops a closed tab from the lists without refetching. */
+  const removeTab = useCallback((tabId: number) => {
+    setAllTabs((prev) => prev.filter((t) => t.tabId !== tabId));
+    setTabs((prev) => prev.filter((t) => t.tabId !== tabId));
+  }, []);
+
+  /** windowId ->"Window N" number, in order of first appearance. */
   const windowLabels = useMemo(() => {
     const map = new Map<number, number>();
     let n = 1;
@@ -46,5 +59,5 @@ export function useTabs(query: string) {
 
   const totalWindows = windowCount || windowLabels.size;
 
-  return { allTabs, tabs, windowLabels, totalWindows };
+  return { allTabs, tabs, windowLabels, totalWindows, loading, removeTab };
 }

@@ -23,7 +23,17 @@ export function useSelection() {
     });
   }, []);
 
+  /** Forgets a tab (e.g. it was just closed). */
+  const drop = useCallback((tabId: number) => {
+    setSelected((prev) => {
+      if (!prev.has(tabId)) return prev;
+      const next = new Set(prev);
+      next.delete(tabId);
+      return next;
+    });
+  }, []);
+
   const ids = useMemo(() => [...selected], [selected]);
 
-  return { selected, ids, count: selected.size, toggle, toggleMany };
+  return { selected, ids, count: selected.size, toggle, toggleMany, drop };
 }

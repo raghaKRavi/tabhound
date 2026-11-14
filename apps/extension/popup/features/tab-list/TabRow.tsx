@@ -16,9 +16,10 @@ type Props = {
   onHover: () => void;
   onToggleSelect: (tabId: number) => void;
   onOpen: (doc: TabDoc) => void;
+  onClose?: (doc: TabDoc) => void;
 };
 
-export function TabRow({ row, query, selected, highlighted, onHover, onToggleSelect, onOpen }: Props) {
+export function TabRow({ row, query, selected, highlighted, onHover, onToggleSelect, onOpen, onClose }: Props) {
   const { doc, color, nested, last } = row;
   const classes = [
     'row',
@@ -54,6 +55,20 @@ export function TabRow({ row, query, selected, highlighted, onHover, onToggleSel
           <span class="pinmark" title="Pinned" aria-label="Pinned">
             <Icon name="pin" size={13} />
           </span>
+        )}
+        {onClose && (
+          <button
+            type="button"
+            class="row-close"
+            title="Close tab"
+            aria-label={`Close ${doc.title || shortUrl(doc.url)}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose(doc);
+            }}
+          >
+            <Icon name="x" size={14} />
+          </button>
         )}
       </div>
     </div>

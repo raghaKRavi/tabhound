@@ -33,7 +33,18 @@ export function useTabActions(selectedIds: number[], allTabs: TabDoc[]) {
     if (selectedIds.length) return run({ type: 'closeSelected', tabIds: selectedIds });
   }, [selectedIds, run]);
 
-  const closeOthers = useCallback(() => {
+  /** Closes one tab and keeps the popup open so several can be closed in a row. */
+  const closeTab = useCallback(async (tabId: number): Promise<boolean> => {
+    try {
+      await send({ type: 'closeSelected', tabIds: [tabId] });
+      return true;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      return false;
+    }
+  }, []);
+
+  const closeOthers =useCallback(() => {
     if (selectedIds.length) return run({ type: 'closeOthers', keepTabIds: selectedIds });
   }, [selectedIds, run]);
 
@@ -63,6 +74,7 @@ export function useTabActions(selectedIds: number[], allTabs: TabDoc[]) {
     openTab,
     openSelected,
     closeSelected,
+    closeTab,
     closeOthers,
     moveToNewWindow,
     setPinned,
