@@ -11,17 +11,20 @@ Privacy policy URL (same for all): `https://github.com/raghaKRavi/tabhound/blob/
 **Name:** Tabhound
 
 **Short description (≤132 chars, Chrome/Edge summary):**
-Find any open tab across all windows by title or URL, then jump to it, group tabs, or close the rest.
+Tab search for all your windows: find a tab by title or URL, jump to it, group tabs, or close the rest. 100% private.
+
+**Suggested store title (search-friendly, ≤75 chars):** Tabhound: Tab Search & Tab Manager
 
 **Category:** Productivity (Chrome, Edge) · Tabs (Firefox: "Tabs")
 
 **Long description:**
-> Too many tabs? Tabhound finds the one you want.
+> Too many tabs? Tabhound is a fast tab search and tab manager that finds the one you want.
 >
-> Open Tabhound, type a few letters, and it searches every tab in every window by title and
-> URL. Press Enter to jump straight to it.
+> Open Tabhound, type a few letters, and it searches every open tab in every window by title and
+> URL. Press Enter to jump straight to it. Use it as a tab finder, tab switcher or tab closer.
 >
 > • Fuzzy, instant search across all windows
+> • Close tabs straight from the results with the x button
 > • Select several tabs, then close everything else (browser built-ins keep only one)
 > • Pin or unpin selected tabs; pinned tabs are listed first
 > • Group selected tabs, or move them into a new window (where your browser supports tab groups)
@@ -30,6 +33,10 @@ Find any open tab across all windows by title or URL, then jump to it, group tab
 >
 > Private by design: no account, no server, no analytics. Tabhound never sends your tabs or
 > browsing data anywhere. Everything stays in your browser.
+>
+> About the install prompt: Chrome words the "tabs" permission as "Read your browsing history".
+> Tabhound only reads the titles and URLs of your currently open tabs (that is what it searches)
+> and never reads your history. "Manage tab groups" is only used when you group tabs yourself.
 
 **Single purpose (Chrome):** Search and manage the user's open browser tabs.
 
