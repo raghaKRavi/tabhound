@@ -1,24 +1,34 @@
 .dupstrip {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 8px 6px;
-  padding: 6px 10px;
-  border-radius: var(--radius-md);
-  background: var(--bg-warning);
-  color: var(--text-warning);
+  gap: 10px;
+  margin: 2px 14px 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+  border: 1px solid #f0dca8;
+  background: #fdf3dd;
+  color: #7a5a12;
   font-size: 12px;
+}
+.dupstrip svg {
+  color: #a9780f;
 }
 .dupstrip span {
   flex: 1;
 }
 .dupstrip button {
   flex: none;
-  padding: 3px 9px;
-  font-size: 11px;
-  border: 0.5px solid var(--border-secondary);
-  border-radius: var(--radius-md);
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid #e9c77e;
+  border-radius: 999px;
   background: var(--bg-primary);
-  color: var(--text-primary);
+  color: #8a5a12;
   cursor: pointer;
+}
+.dupstrip button:hover {
+  background: #fff8e8;
 }

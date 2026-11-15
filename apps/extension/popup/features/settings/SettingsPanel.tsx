@@ -26,7 +26,19 @@ export function SettingsPanel({ contentSearchEnabled, onToggleContentSearch, onC
               : 'Also match each page’s description and main heading. Needs access to all sites.'}
           </span>
         </div>
-        <button onClick={onToggleContentSearch}>{contentSearchEnabled ? 'Turn off' : 'Turn on'}</button>
+        <button
+          type="button"
+          role="switch"
+          class={`switch${contentSearchEnabled ? ' on' : ''}`}
+          aria-checked={contentSearchEnabled}
+          aria-label="Search page descriptions and headings"
+          onClick={onToggleContentSearch}
+        >
+          <span class="switch-state">{contentSearchEnabled ? 'On' : 'Off'}</span>
+          <span class="switch-track">
+            <span class="switch-knob" />
+          </span>
+        </button>
       </div>
     </div>
   );

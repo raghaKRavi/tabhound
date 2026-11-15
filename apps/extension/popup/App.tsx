@@ -9,8 +9,11 @@ import { GroupPanel } from './features/groups/GroupPanel';
 import { useGroups } from './features/groups/useGroups';
 import { Header } from './features/header/Header';
 import { usePopupKeys } from './features/keyboard/usePopupKeys';
+import { RecentlyClosed } from './features/recently-closed/RecentlyClosed';
+import { useRecentlyClosed } from './features/recently-closed/useRecentlyClosed';
 import { SearchBox } from './features/search/SearchBox';
 import { SettingsPanel } from './features/settings/SettingsPanel';
+import { SelectAllBar } from './features/selection/SelectAllBar';
 import { useSelection } from './features/selection/useSelection';
 import { useTabs } from './features/tabs/useTabs';
 import { TabList } from './features/tab-list/TabList';
@@ -34,6 +37,7 @@ export function App() {
   const selection = useSelection();
   const actions = useTabActions(selection.ids, allTabs);
   const content = useContentSearch();
+  const closed = useRecentlyClosed(query);
   const { highlighted, setHighlighted, move } = useHighlight(visibleTabs.length, [query, allTabs]);
 
   const closeOne = useCallback(
@@ -105,6 +109,23 @@ export function App() {
       />
       <SearchBox query={query} onChange={setQuery} matchCount={tabs.length} />
 
+      {overlay === 'settings' && (
+        <SettingsPanel
+          contentSearchEnabled={content.enabled}
+          onToggleContentSearch={content.toggle}
+          onClose={closeOverlay}
+        />
+      )}
+
+      {!loading && (
+        <SelectAllBar
+          total={tabs.length}
+          selectedCount={tabs.filter((t) => selection.selected.has(t.tabId)).length}
+          onSelectAll={() => selection.setAll(tabs.map((t) => t.tabId))}
+          onClear={() => selection.setAll([])}
+        />
+      )}
+
       {!loading && (
         <DuplicateStrip
           extraCount={dups.visible.extras.length}
@@ -132,15 +153,9 @@ export function App() {
         onToggleCollapse={toggleCollapsed}
         onOpen={actions.openTab}
         onClose={closeOne}
-      />
-
-      {overlay === 'settings' && (
-        <SettingsPanel
-          contentSearchEnabled={content.enabled}
-          onToggleContentSearch={content.toggle}
-          onClose={closeOverlay}
-        />
-      )}
+      >
+        <RecentlyClosed items={closed.items} onReopen={closed.reopen} onDismiss={closed.dismiss} />
+      </TabList>
 
       {actions.error && (
         <NoticeBar actions={<button onClick={actions.clearError}>Dismiss</button>}>

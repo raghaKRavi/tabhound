@@ -19,15 +19,14 @@
 }
 .row.highlighted .row-body,
 .row-body:hover {
-  background: var(--bg-secondary);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .fav {
   width: 22px;
   height: 22px;
-  border-radius: 5px;
-  background: var(--bg-primary);
-  border: 0.5px solid var(--border-tertiary);
+  border-radius: 7px;
+  background: #eeece4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,8 +46,8 @@
   min-width: 0;
 }
 .row .row-title {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12.5px;
+  font-weight: 600;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -69,19 +68,26 @@
   border-radius: 3px;
 }
 
-/* In a group while searching: coloured stripe on the left. */
-.row.ingroup {
-  border-left: 3px solid var(--gc);
-  border-radius: 2px var(--radius-md) var(--radius-md) 2px;
+.row.selected {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-/* Listed under a group header: unbroken guide line in the group colour. The gap below sits
-   inside the row (as padding) so the line has no breaks. */
+/* In a group while searching: tinted row with a coloured rail on the left. */
+.row.ingroup {
+  border-left: 2px solid var(--gc);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  background: color-mix(in srgb, var(--gc) 6%, transparent);
+}
+.row.ingroup.selected {
+  background: color-mix(in srgb, var(--gc) 16%, transparent);
+}
+
+/* Listed under a group header: unbroken rail in the group colour. The gap below sits
+   inside the row (as padding) so the rail has no breaks. */
 .row.nested {
   margin: 0 0 0 14px;
   padding: 0 0 var(--gap) 6px;
-  border-left: 2px solid var(--gc);
-  border-radius: 0;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
 }
 .row.nested.last {
   padding-bottom: 0;
@@ -122,16 +128,16 @@
   gap: 3px;
   padding: 1px 6px;
   border-radius: 999px;
-  background: var(--bg-warning);
-  color: var(--text-warning);
+  background: #fdf0d5;
+  color: #8a5a12;
   font-size: 10px;
+  font-weight: 600;
   white-space: nowrap;
-  border: none;
+  border: 1px solid #f0dca8;
   cursor: pointer;
 }
 .row .dupmark:hover {
-  filter: brightness(0.95);
-  outline: 1px solid var(--text-warning);
+  background: #fbe6bb;
 }
 
 /* pin icon at the right end of a pinned tab's row */

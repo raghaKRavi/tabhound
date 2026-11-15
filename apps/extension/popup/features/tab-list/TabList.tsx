@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact';
 import type { TabDoc } from '@/lib/tab-index';
 import { GroupHeader } from './GroupHeader';
 import { TabRow } from './TabRow';
@@ -24,6 +25,8 @@ type Props = {
   /** tabId -> place within its duplicate set. */
   dupBadges?: Map<number, { n: number; of: number }>;
   onDupClick?: (doc: TabDoc) => void;
+  /** Rendered at the bottom of the same scrollable list (e.g. the recently closed section). */
+  children?: ComponentChildren;
 };
 
 /** Scrollable list of tab rows and group headers. */
@@ -44,6 +47,7 @@ export function TabList({
   onClose,
   dupBadges,
   onDupClick,
+  children,
 }: Props) {
   if (loading) {
     return (
@@ -86,6 +90,7 @@ export function TabList({
           ),
         )
       )}
+      {children}
     </div>
   );
 }

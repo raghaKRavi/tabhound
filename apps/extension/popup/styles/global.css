@@ -1,5 +1,10 @@
 :root {
   --bg-page: #f4f2ec;
+  --bg-app: #faf8f3;
+  /* the logo's indigo gradient */
+  --accent: #4f46e5;
+  --accent-dark: #312e81;
+  --accent-gradient: linear-gradient(135deg, var(--accent), var(--accent-dark));
   --bg-primary: #ffffff;
   --bg-secondary: #f1efe8;
   --bg-info: #e6f1fb;
@@ -32,7 +37,7 @@ html, body {
   padding: 0;
   width: 380px;
   min-height: 520px;
-  background: #ffffff !important;
+  background: var(--bg-app) !important;
   color: #1c1b19 !important;
   font-size: 14px;
 }

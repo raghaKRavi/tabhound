@@ -8,7 +8,7 @@ type Props = {
   onToggle: () => void;
 };
 
-/** The beige checkbox box used on tab rows and group headers. */
+/** The circular checkbox used on tab rows and group headers. */
 export function CheckZone({ checked, indeterminate, label, title, onToggle }: Props) {
   return (
     <div

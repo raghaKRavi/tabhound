@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { SettingsPanel } from './SettingsPanel';
 
 describe('SettingsPanel', () => {
-  it('offers "Turn on" while content search is off and toggles it', () => {
+  it('shows an "Off" switch while content search is off and toggles it', () => {
     const onToggleContentSearch = vi.fn();
     render(
       <SettingsPanel
@@ -12,16 +12,20 @@ describe('SettingsPanel', () => {
         onClose={() => {}}
       />,
     );
-    fireEvent.click(screen.getByText('Turn on'));
+    const toggle = screen.getByRole('switch');
+    expect(toggle.getAttribute('aria-checked')).toBe('false');
+    expect(screen.getByText('Off')).toBeTruthy();
+    fireEvent.click(toggle);
     expect(onToggleContentSearch).toHaveBeenCalledTimes(1);
   });
 
-  it('offers "Turn off" while it is on, and closes', () => {
+  it('shows an "On" switch while it is on, and closes', () => {
     const onClose = vi.fn();
     render(
       <SettingsPanel contentSearchEnabled onToggleContentSearch={() => {}} onClose={onClose} />,
     );
-    expect(screen.getByText('Turn off')).toBeTruthy();
+    expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('true');
+    expect(screen.getByText('On')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Close settings'));
     expect(onClose).toHaveBeenCalledTimes(1);
   });

@@ -1,6 +1,9 @@
 .settings {
-  border-top: 0.5px solid var(--border-tertiary);
-  background: var(--bg-secondary);
+  margin: 4px 14px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  flex-shrink: 0;
   font-size: 12px;
   color: var(--text-secondary);
 }
@@ -43,13 +46,53 @@
   font-weight: 500;
   color: var(--text-primary);
 }
-.settings-row > button {
+.switch {
   flex: none;
-  padding: 4px 9px;
-  font-size: 11px;
-  border: 0.5px solid var(--border-secondary);
-  border-radius: var(--radius-md);
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
   cursor: pointer;
+}
+.switch-state {
+  min-width: 18px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+.switch.on .switch-state {
+  color: #1e8e3e;
+}
+.switch-track {
+  position: relative;
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  background: #d8d5c9;
+  transition: background 0.15s;
+}
+.switch.on .switch-track {
+  background: #1e8e3e;
+}
+.switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: left 0.15s;
+}
+.switch.on .switch-knob {
+  left: 16px;
+}
+.switch:focus-visible .switch-track {
+  outline: 2px solid var(--border-info);
+  outline-offset: 2px;
 }
