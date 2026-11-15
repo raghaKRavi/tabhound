@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { canGroupTabs } from '../../shared/lib/capabilities';
 import { Icon } from '../../shared/ui/Icon';
 import './ActionBar.css';
@@ -40,6 +40,25 @@ export function ActionBar({
   onCloseOthers,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Close the menu on a click anywhere outside it, or on Escape.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen]);
+
   const pick = (action: () => void) => () => {
     setMenuOpen(false);
     action();
@@ -49,18 +68,16 @@ export function ActionBar({
     <div class="actionbar">
       <span class="count">{selectedCount} selected</span>
       {selectedCount === 1 && (
-        <button onClick={onOpen}>
+        <button class="primary" onClick={onOpen}>
           <Icon name="arrow-right" size={14} />
           Open
         </button>
       )}
       <button class="danger" onClick={onCloseSelected}>
-        <Icon name="x" size={14} />
         Close selected
       </button>
-      <div class="menu-wrap">
+      <div class="menu-wrap" ref={wrapRef}>
         <button onClick={() => setMenuOpen((v) => !v)}>
-          <Icon name="dots" size={14} />
           Actions
           <Icon name="chevron-down" size={13} />
         </button>

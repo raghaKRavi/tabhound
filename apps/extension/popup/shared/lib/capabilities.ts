@@ -2,5 +2,8 @@
 // `favicon` / `tabGroups` where the browser supports them.
 export const canUseFaviconApi = (chrome.runtime.getManifest().permissions ?? []).includes('favicon');
 
+export const canUseSessions =
+  typeof chrome.sessions?.getRecentlyClosed === 'function' && typeof chrome.sessions?.restore === 'function';
+
 export const canGroupTabs =
   typeof chrome.tabs?.group === 'function' && typeof chrome.tabGroups?.update === 'function';

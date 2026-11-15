@@ -36,6 +36,8 @@ export default defineConfig({
       permissions: [
         'tabs',
         'scripting',
+        // "Recently closed" list and reopening a closed tab.
+        'sessions',
         // Chromium-only APIs (Chrome, Edge, Brave, Vivaldi, Arc); the popup
         // feature-detects them, so the UI adapts where they're absent.
         ...(firefox ? [] : ['tabGroups', 'favicon']),

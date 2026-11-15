@@ -1,25 +1,59 @@
+/* One circular checkbox for tab rows and group headers: same size and style everywhere. */
 .checkzone {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
-  border-radius: var(--radius-md);
-  background: var(--bg-secondary);
+  align-self: center;
+  padding: 0 4px 0 8px;
   cursor: pointer;
-  transition: background 0.12s;
   flex-shrink: 0;
 }
-.checkzone:hover {
-  background: #dfe9f5;
-}
-.checkzone.checked {
-  background: var(--bg-info);
-}
 .checkzone input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
   margin: 0;
-  accent-color: var(--text-info);
+  border: 1.6px solid #c9c6ba;
+  border-radius: 50%;
+  background: var(--bg-primary);
   cursor: pointer;
   pointer-events: none;
+  transition: background 0.12s, border-color 0.12s;
+}
+.checkzone:hover input[type='checkbox'] {
+  border-color: var(--accent);
+}
+.checkzone input[type='checkbox']:checked,
+.checkzone input[type='checkbox']:indeterminate {
+  background: var(--accent-gradient);
+  border-color: var(--accent);
+}
+.checkzone input[type='checkbox']:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 3.5px;
+  height: 7px;
+  border: solid #fff;
+  border-width: 0 1.6px 1.6px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.checkzone input[type='checkbox']:indeterminate::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 1.8px;
+  transform: translate(-50%, -50%);
+  border-radius: 1px;
+  background: #fff;
+}
+.checkzone input[type='checkbox']:focus-visible {
+  outline: 2px solid var(--border-info);
+  outline-offset: 2px;
 }

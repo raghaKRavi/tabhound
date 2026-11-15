@@ -50,6 +50,20 @@ describe('ActionBar', () => {
     expect(screen.getByText('Move to new window')).toBeTruthy();
   });
 
+  it('closes the menu on a click outside it or on Escape, but not on a click inside', () => {
+    setup();
+    openMenu();
+    fireEvent.mouseDown(screen.getByText('Move to new window'));
+    expect(screen.getByText('Move to new window')).toBeTruthy();
+
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByText('Move to new window')).toBeNull();
+
+    openMenu();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByText('Move to new window')).toBeNull();
+  });
+
   it.each([
     ['Group tabs', 'onGroup'],
     ['Pin tabs', 'onTogglePin'],
