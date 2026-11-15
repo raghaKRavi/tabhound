@@ -13,6 +13,12 @@ type Props = {
   onOpen: () => void;
   onCloseSelected: () => void;
   onGroup: () => void;
+  /** Some selected tab is in a group, so the menu offers "Ungroup tabs". */
+  anyGrouped?: boolean;
+  onUngroup?: () => void;
+  /** The one selected tab has copies; offers "Select its duplicates". */
+  hasDuplicates?: boolean;
+  onSelectDuplicates?: () => void;
   onMoveToNewWindow: () => void;
   onCloseOthers: () => void;
 };
@@ -26,6 +32,10 @@ export function ActionBar({
   onOpen,
   onCloseSelected,
   onGroup,
+  anyGrouped = false,
+  onUngroup,
+  hasDuplicates = false,
+  onSelectDuplicates,
   onMoveToNewWindow,
   onCloseOthers,
 }: Props) {
@@ -62,6 +72,12 @@ export function ActionBar({
                 Group tabs
               </button>
             )}
+            {canGroupTabs && anyGrouped && onUngroup && (
+              <button class="menu-item" onClick={pick(onUngroup)}>
+                <Icon name="ungroup" size={15} />
+                Ungroup tabs
+              </button>
+            )}
             <button
               class="menu-item"
               onClick={pick(onTogglePin)}
@@ -70,6 +86,12 @@ export function ActionBar({
               <Icon name="pin" size={15} />
               {allPinned ? 'Unpin tabs' : 'Pin tabs'}
             </button>
+            {selectedCount === 1 && hasDuplicates && onSelectDuplicates && (
+              <button class="menu-item" onClick={pick(onSelectDuplicates)}>
+                <Icon name="copy" size={15} />
+                Select duplicates of this tab
+              </button>
+            )}
             <button class="menu-item" onClick={pick(onMoveToNewWindow)}>
               <Icon name="app-window" size={15} />
               Move to new window

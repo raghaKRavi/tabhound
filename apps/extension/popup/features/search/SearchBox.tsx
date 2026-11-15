@@ -28,7 +28,14 @@ export function SearchBox({ query, onChange, matchCount }: Props) {
           type="text"
           placeholder="Search open tabs…"
           value={query}
-          onInput={(e) => onChange((e.target as HTMLInputElement).value)}
+          onInput={(e) => {
+            const input = e.target as HTMLInputElement;
+            // Leading spaces mean nothing, so a blank box stays blank (no search, no "N matches").
+            // Spaces between words are kept for multi-word searches.
+            const cleaned = input.value.replace(/^\s+/, '');
+            if (cleaned !== input.value) input.value = cleaned;
+            onChange(cleaned);
+          }}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           autoFocus

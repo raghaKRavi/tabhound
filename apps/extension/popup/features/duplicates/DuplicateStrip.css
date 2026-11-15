@@ -1,19 +1,20 @@
-.contentbar {
+.dupstrip {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
-  border-top: 0.5px solid var(--border-tertiary);
-  background: var(--bg-secondary);
-  font-size: 11px;
-  color: var(--text-secondary);
+  margin: 0 8px 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-warning);
+  color: var(--text-warning);
+  font-size: 12px;
 }
-.contentbar span {
+.dupstrip span {
   flex: 1;
 }
-.contentbar button {
+.dupstrip button {
   flex: none;
-  padding: 3px 8px;
+  padding: 3px 9px;
   font-size: 11px;
   border: 0.5px solid var(--border-secondary);
   border-radius: var(--radius-md);

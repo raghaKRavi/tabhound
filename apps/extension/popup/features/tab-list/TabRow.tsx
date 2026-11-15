@@ -17,9 +17,13 @@ type Props = {
   onToggleSelect: (tabId: number) => void;
   onOpen: (doc: TabDoc) => void;
   onClose?: (doc: TabDoc) => void;
+  /** Set when the tab is open more than once: its place in the set, e.g. 2 of 4. */
+  dup?: { n: number; of: number };
+  /** Clicking the badge keeps this tab and selects the other copies in its set. */
+  onDupClick?: (doc: TabDoc) => void;
 };
 
-export function TabRow({ row, query, selected, highlighted, onHover, onToggleSelect, onOpen, onClose }: Props) {
+export function TabRow({ row, query, selected, highlighted, onHover, onToggleSelect, onOpen, onClose, dup, onDupClick }: Props) {
   const { doc, color, nested, last } = row;
   const classes = [
     'row',
@@ -51,6 +55,20 @@ export function TabRow({ row, query, selected, highlighted, onHover, onToggleSel
             <Highlight text={shortUrl(doc.url)} query={query} />
           </p>
         </div>
+        {dup && (
+          <button
+            type="button"
+            class="dupmark"
+            title={`Copy ${dup.n} of ${dup.of}. Click to keep this one and select the other copies`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDupClick?.(doc);
+            }}
+          >
+            <Icon name="copy" size={11} />
+            {dup.n} of {dup.of}
+          </button>
+        )}
         {doc.pinned && (
           <span class="pinmark" title="Pinned" aria-label="Pinned">
             <Icon name="pin" size={13} />
