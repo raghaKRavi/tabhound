@@ -1,0 +1,87 @@
+name: Release to Chrome Web Store
+
+# Runs when a PR is merged (a push lands on main). It bumps the patch version,
+# builds, uploads to the Chrome Web Store, then commits the new version back.
+# For a minor/major release, run `pnpm bump minor|major` in the PR and set the
+# version yourself: the job then skips its own bump (see "Bump version").
+on:
+  push:
+    branches: [main]
+    # Don't release for docs/design-only merges.
+    paths:
+      - 'apps/extension/**'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write # needed to push the version bump commit
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Ignore the bot's own version commit (it can't retrigger anyway, belt and braces).
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Bump version
+        id: version
+        run: |
+          # If the PR already changed the version by hand, respect it; otherwise bump patch.
+          OLD=$(git show HEAD~1:apps/extension/package.json 2>/dev/null | jq -r .version || echo "")
+          CUR=$(jq -r .version apps/extension/package.json)
+          if [ "$OLD" = "$CUR" ]; then
+            node scripts/bump.mjs patch
+          fi
+          echo "version=$(jq -r .version apps/extension/package.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Install, verify, package
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+          pnpm test
+          pnpm zip
+
+      - name: Upload to Chrome Web Store
+        env:
+          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        # Uploads as a draft. Add `--auto-publish` to also submit it for review.
+        run: |
+          ZIP=$(ls apps/extension/.output/*-chrome.zip | head -n1)
+          echo "Uploading $ZIP"
+          npx --yes chrome-webstore-upload-cli@3 upload --source "$ZIP"
+
+      # Only after a successful upload, so a failed run doesn't burn a version number.
+      - name: Commit the bumped version
+        run: |
+          if git diff --quiet; then
+            echo "Version was already bumped in the PR, nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore: release v${{ steps.version.outputs.version }} [skip ci]"
+          git push
+
+      - name: Keep the zip as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tabhound-${{ steps.version.outputs.version }}-chrome
+          path: apps/extension/.output/*-chrome.zip
