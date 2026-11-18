@@ -1,3 +1,4 @@
+import { useState } from 'preact/hooks';
 import { shortUrl } from '../../shared/lib/url';
 import { timeAgo } from '../../shared/lib/time';
 import { Icon } from '../../shared/ui/Icon';
@@ -13,11 +14,24 @@ type Props = {
 
 /** Dimmed rows at the bottom of the tab list: tabs closed lately, with reopen and dismiss. */
 export function RecentlyClosed({ items, onReopen, onDismiss }: Props) {
+  const [open, setOpen] = useState(true);
   if (items.length === 0) return null;
   return (
     <section class="closed" aria-label="Recently closed">
-      <h2 class="closed-head">Recently closed</h2>
-      {items.map((tab) => (
+      <h2 class="closed-head-wrap">
+        <button
+          type="button"
+          class="closed-head"
+          aria-expanded={open}
+          onClick={() => setOpen(!open)}
+        >
+          <span class={`closed-chevron${open ? '' : ' collapsed'}`}>
+            <Icon name="chevron-down" size={12} />
+          </span>
+          Recently closed ({items.length})
+        </button>
+      </h2>
+      {open && items.map((tab) => (
         <div class="closed-row" key={tab.sessionId}>
           <div class="fav">
             <Favicon url={tab.url} favIconUrl={tab.favIconUrl} />

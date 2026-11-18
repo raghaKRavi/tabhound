@@ -91,7 +91,10 @@ export default defineBackground(() => {
       const doc = tabToDoc(t);
       if (doc) store.upsert(doc);
     }
-    if (await syncContentScript()) void requestMetaFromTabs(tabs);
+    // Don't make the popup wait on content-script bookkeeping.
+    void syncContentScript()
+      .then((on) => (on ? requestMetaFromTabs(tabs) : undefined))
+      .catch(() => {});
   }
 
   function scheduleRebuild() {

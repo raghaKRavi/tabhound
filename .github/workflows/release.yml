@@ -62,11 +62,11 @@ jobs:
           CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
-        # Uploads as a draft. Add `--auto-publish` to also submit it for review.
+        # Uploads and submits for review in one step. Drop `--auto-publish` to upload a draft only.
         run: |
           ZIP=$(ls apps/extension/.output/*-chrome.zip | head -n1)
           echo "Uploading $ZIP"
-          npx --yes chrome-webstore-upload-cli@3 upload --source "$ZIP"
+          npx --yes chrome-webstore-upload-cli@3 upload --source "$ZIP" --auto-publish
 
       # Only after a successful upload, so a failed run doesn't burn a version number.
       - name: Commit the bumped version

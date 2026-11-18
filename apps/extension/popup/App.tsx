@@ -45,9 +45,10 @@ export function App() {
       if (await actions.closeTab(doc.tabId)) {
         removeTab(doc.tabId);
         selection.drop(doc.tabId);
+        closed.refresh();
       }
     },
-    [actions.closeTab, removeTab, selection.drop],
+    [actions.closeTab, removeTab, selection.drop, closed.refresh],
   );
 
   const closeOverlay =useCallback(() => setOverlay('none'), []);

@@ -36,7 +36,7 @@ export function useRecentlyClosed(query: string) {
   const [all, setAll] = useState<ClosedTab[]>([]);
   const [dismissed, setDismissed] = useState<Set<string>>(loadDismissed);
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
     if (!canUseSessions) return;
     chrome.sessions
       .getRecentlyClosed({ maxResults: FETCH_LIMIT })
@@ -59,6 +59,8 @@ export function useRecentlyClosed(query: string) {
         /* no history available; the section stays hidden */
       });
   }, []);
+
+  useEffect(refresh, [refresh]);
 
   const items = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -86,5 +88,5 @@ export function useRecentlyClosed(query: string) {
     setAll((prev) => prev.filter((t) => t.sessionId !== tab.sessionId));
   }, []);
 
-  return { items, reopen, dismiss };
+  return { items, reopen, dismiss, refresh };
 }
