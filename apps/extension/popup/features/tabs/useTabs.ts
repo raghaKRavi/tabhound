@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
 import type { ListResponse, SearchResponse } from '@/lib/messaging';
-import type { TabDoc } from '@/lib/tab-index';
+import { tabToDoc, type TabDoc } from '@/lib/tab-index';
 import { send } from '../../shared/lib/messaging-client';
 
 /**
@@ -15,14 +15,31 @@ export function useTabs(query: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    send<ListResponse>({ type: 'list' })
-      .then((r) => {
-        setAllTabs(r.tabs);
-        setTabs(r.tabs);
-        setWindowCount(r.windowCount);
+    // Read tabs straight from the browser: no wait for the background worker to wake up and
+    // re-index. Falls back to the background list if the direct query fails.
+    const apply = (list: TabDoc[]) => {
+      setAllTabs(list);
+      setTabs(list);
+      setWindowCount(new Set(list.map((t) => t.windowId)).size);
+    };
+    chrome.tabs
+      .query({})
+      .then((found) => {
+        const docs: TabDoc[] = [];
+        for (const t of found) {
+          const doc = tabToDoc(t);
+          if (doc) docs.push(doc);
+        }
+        apply(docs);
       })
+      .catch(() =>
+        send<ListResponse>({ type: 'list' }).then((r) => {
+          apply(r.tabs);
+          setWindowCount(r.windowCount);
+        }),
+      )
       .catch(() => {
-        /* background unavailable; show the empty state */
+        /* nothing available; show the empty state */
       })
       .finally(() => setLoading(false));
   }, []);
