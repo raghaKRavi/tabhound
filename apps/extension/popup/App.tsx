@@ -2,6 +2,9 @@ import { useCallback, useMemo, useState } from 'preact/hooks';
 import { ActionBar } from './features/actions/ActionBar';
 import { ConfirmCloseOthers } from './features/actions/ConfirmCloseOthers';
 import { useTabActions } from './features/actions/useTabActions';
+import { BookmarkActionBar } from './features/bookmarks/BookmarkActionBar';
+import { Bookmarks } from './features/bookmarks/Bookmarks';
+import { useBookmarks } from './features/bookmarks/useBookmarks';
 import { useContentSearch } from './features/content-search/useContentSearch';
 import { DuplicateStrip } from './features/duplicates/DuplicateStrip';
 import { useDuplicates } from './features/duplicates/useDuplicates';
@@ -38,6 +41,7 @@ export function App() {
   const actions = useTabActions(selection.ids, allTabs);
   const content = useContentSearch();
   const closed = useRecentlyClosed(query);
+  const bookmarks = useBookmarks(query);
   const { highlighted, setHighlighted, move } = useHighlight(visibleTabs.length, [query, allTabs]);
 
   const closeOne = useCallback(
@@ -108,7 +112,14 @@ export function App() {
         windowCount={totalWindows}
         onSettings={() => setOverlay((o) => (o === 'settings' ? 'none' : 'settings'))}
       />
-      <SearchBox query={query} onChange={setQuery} matchCount={tabs.length} />
+      <SearchBox
+        query={query}
+        onChange={setQuery}
+        matchCount={tabs.length}
+        bookmarks={bookmarks.enabled}
+        bookmarkCount={bookmarks.hits.length}
+        onToggleBookmarks={bookmarks.toggle}
+      />
 
       {overlay === 'settings' && (
         <SettingsPanel
@@ -143,6 +154,8 @@ export function App() {
         rows={rows}
         loading={loading}
         matchCount={tabs.length}
+        extraMatches={bookmarks.hits.length}
+        extraSearching={bookmarks.searching}
         query={query}
         selected={selection.selected}
         highlighted={highlighted}
@@ -155,12 +168,26 @@ export function App() {
         onOpen={actions.openTab}
         onClose={closeOne}
       >
+        <Bookmarks
+          query={query}
+          enabled={bookmarks.enabled}
+          hits={bookmarks.hits}
+          searching={bookmarks.searching}
+          selected={bookmarks.selected}
+          onToggle={bookmarks.toggleSelect}
+        />
         <RecentlyClosed items={closed.items} onReopen={closed.reopen} onDismiss={closed.dismiss} />
       </TabList>
 
       {actions.error && (
         <NoticeBar actions={<button onClick={actions.clearError}>Dismiss</button>}>
           {actions.error}
+        </NoticeBar>
+      )}
+
+      {bookmarks.error && (
+        <NoticeBar actions={<button onClick={bookmarks.clearError}>Dismiss</button>}>
+          {bookmarks.error}
         </NoticeBar>
       )}
 
@@ -185,9 +212,28 @@ export function App() {
         />
       )}
 
+      {bookmarks.notice && (
+        <NoticeBar actions={<button onClick={bookmarks.clearNotice}>OK</button>}>
+          {bookmarks.notice}
+        </NoticeBar>
+      )}
+
+      {/* Tabs and bookmarks are different things: a mixed selection gets both bars. */}
+      {bookmarks.selectedHits.length > 0 && (
+        <BookmarkActionBar
+          selectedCount={bookmarks.selectedHits.length}
+          label={selection.count > 0 ? 'bookmarks selected' : 'selected'}
+          onOpenTabs={bookmarks.openSelectedInTabs}
+          onOpenWindow={bookmarks.openSelectedInWindow}
+          onMove={bookmarks.moveSelected}
+          onRemove={bookmarks.removeSelected}
+        />
+      )}
+
       {selection.count > 0 && (
         <ActionBar
           selectedCount={selection.count}
+          label={bookmarks.selectedHits.length > 0 ? 'tabs selected' : 'selected'}
           allPinned={allPinned}
           pinLeavesGroup={pinLeavesGroup}
           onTogglePin={() => actions.setPinned(!allPinned)}

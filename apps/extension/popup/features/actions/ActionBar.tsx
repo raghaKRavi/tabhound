@@ -5,6 +5,8 @@ import './ActionBar.css';
 
 type Props = {
   selectedCount: number;
+  /** Names the selection when a bookmark bar is shown too, e.g. "tabs selected". */
+  label?: string;
   /** Every selected tab is already pinned, so the menu offers "Unpin". */
   allPinned: boolean;
   /** Some selected tab is in a group; pinning will take it out. */
@@ -26,6 +28,7 @@ type Props = {
 /** Bar of bulk actions shown while tabs are selected. */
 export function ActionBar({
   selectedCount,
+  label = 'selected',
   allPinned,
   pinLeavesGroup,
   onTogglePin,
@@ -66,7 +69,9 @@ export function ActionBar({
 
   return (
     <div class="actionbar">
-      <span class="count">{selectedCount} selected</span>
+      <span class="count">
+        {selectedCount} {label}
+      </span>
       {selectedCount === 1 && (
         <button class="primary" onClick={onOpen}>
           <Icon name="arrow-right" size={14} />

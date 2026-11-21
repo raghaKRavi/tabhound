@@ -11,6 +11,10 @@ type Props = {
   loading?: boolean;
   /** Number of tabs matching the query (zero shows the empty message). */
   matchCount: number;
+  /** Matches from other sources shown below the list (bookmarks); they suppress the empty message. */
+  extraMatches?: number;
+  /** True while those other sources are still searching. */
+  extraSearching?: boolean;
   query: string;
   selected: Set<number>;
   highlighted: number;
@@ -34,6 +38,8 @@ export function TabList({
   rows,
   loading = false,
   matchCount,
+  extraMatches = 0,
+  extraSearching = false,
   query,
   selected,
   highlighted,
@@ -59,7 +65,15 @@ export function TabList({
   return (
     <div class="results">
       {matchCount === 0 ? (
-        <div class="empty">{query ? 'No tabs match your search.' : 'No open tabs.'}</div>
+        // Bookmark matches below make "no tabs" a partial result, not an empty search; while
+        // they are still loading, don't claim there is nothing yet.
+        extraSearching ? (
+          <div class="inline-loading" role="status" aria-label="Searching bookmarks">
+            <div class="spinner" />
+          </div>
+        ) : extraMatches > 0 ? null : (
+          <div class="empty">{query ? 'No tabs match your search.' : 'No open tabs.'}</div>
+        )
       ) : (
         rows.map((row) =>
           row.kind === 'header' ? (

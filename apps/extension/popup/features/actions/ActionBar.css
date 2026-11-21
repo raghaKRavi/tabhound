@@ -87,3 +87,13 @@
 .menu button.menu-item.danger {
   color: var(--text-danger);
 }
+.menu .folder-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.menu .menu-note {
+  margin: 0;
+  padding: 9px 10px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
