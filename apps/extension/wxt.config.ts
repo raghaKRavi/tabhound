@@ -42,8 +42,9 @@ export default defineConfig({
         // feature-detects them, so the UI adapts where they're absent.
         ...(firefox ? [] : ['tabGroups', 'favicon']),
       ],
-      // Content search is opt-in: requested at runtime from the popup.
+      // Content search and bookmark search are opt-in: requested at runtime from the popup.
       optional_host_permissions: ['<all_urls>'],
+      optional_permissions: ['bookmarks'],
       action: {
         default_title: 'Tabhound',
       },

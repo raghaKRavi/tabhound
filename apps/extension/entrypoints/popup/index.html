@@ -4,9 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tabhound</title>
+    <!-- Painted before the app bundle loads, so the popup never opens blank. main.tsx clears it. -->
+    <style>
+      html, body { width: 380px; min-height: 520px; margin: 0; background: #faf8f3; }
+      .boot { display: flex; align-items: center; justify-content: center; height: 520px; }
+      .boot i {
+        width: 28px; height: 28px; box-sizing: border-box;
+        border: 3px solid #aba894; border-top-color: transparent; border-radius: 50%;
+        opacity: 0.6; animation: boot-spin 0.8s linear infinite;
+      }
+      @keyframes boot-spin { to { transform: rotate(360deg); } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="boot" role="status" aria-label="Loading"><i></i></div></div>
     <script type="module" src="./main.tsx"></script>
   </body>
 </html>

@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 
 type Props = {
-  name: 'search' | 'x' | 'arrow-right' | 'chevron-down' | 'dots' | 'grid-add' | 'copy' | 'settings' | 'ungroup' | 'app-window' | 'world' | 'pin' | 'reopen';
+  name: 'search' | 'x' | 'arrow-right' | 'chevron-down' | 'dots' | 'grid-add' | 'copy' | 'settings' | 'ungroup' | 'app-window' | 'world' | 'pin' | 'reopen' | 'bookmark';
   size?: number;
   color?: string;
   strokeWidth?: number;
@@ -79,6 +79,7 @@ const PATHS: Record<Props['name'], ComponentChildren> = {
       <path d="M5 10h11a4 4 0 1 1 0 8h-1" />
     </>
   ),
+  bookmark: <path d="M9 4h6a2 2 0 0 1 2 2v14l-5 -3l-5 3v-14a2 2 0 0 1 2 -2" />,
   world: (
     <>
       <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
